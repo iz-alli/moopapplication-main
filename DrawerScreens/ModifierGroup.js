@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component} from 'react';
 
-import { SafeAreaView, Button,StyleSheet, Text, TouchableOpacity, TouchableHighlight, View, Modal,Dimensions, Alert, TextInput} from 'react-native';
+import { TextInput, StyleSheet, Text, TouchableOpacity, TouchableHighlight, View, Modal,Dimensions, Alert} from 'react-native';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 import {Card} from 'react-native-shadow-cards';
@@ -8,21 +8,21 @@ import moment from 'moment';
 const { width } = Dimensions.get("window");
 
 
+
 export default function Basic({navigation}) {
   const [isModalVisible, setModalVisible] = useState(false);
 	const [inputValue, setInputValue] = useState("");
+  const [search, setSearch] = useState('');
 	const toggleModalVisibility = () => {
 		setModalVisible(!isModalVisible);
     };
 
-
   const [listData, setListData] = useState([]);
-  const [search, setSearch] = useState('');
 
 
   useEffect(() => {                   
     const unsubscribe = navigation.addListener('focus', () => {
-      fetch('http://testweb.izaap.in/moop/api/index.php/service/orders/lists?X-API-KEY=MoopApp2021@!&user_id=251',{
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/modifier_group/lists?X-API-KEY=MoopApp2021@!',{
         method: 'GET'
         //Request Type 
         })
@@ -35,7 +35,8 @@ export default function Basic({navigation}) {
               setListData(data);    
               console.log('data 1',data);
               if(data != undefined){ 
-                      data.map((item, index)=>{                          
+                      data.map((item, index)=>{  
+                        
                       //const obj = JSON.parse(item.menujson);      
                   //     obj.map((objitem, index)=>{       
                    })       
@@ -69,33 +70,25 @@ return unsubscribe;
   
   const ItemView = ({item}) => 
   {        
-    let id="", tableid="",seats="",amount="",orderdatetime="",updatedatetime="",completeddatetime="",specialInstruction="", comments="", tipAmount=""; 
+    let id="", modifierGroupName="",minRequired="",maxAllowed="",createdDate="",updatedDate=""; 
     try{   
-      tableid=item.tableid;
-      seats=item.seats;
-      amount=item.amount;
-      orderdatetime=item.orderdatetime;
-      updatedatetime=item.updatedatetime;
-      completeddatetime=item.completeddatetime;
-      specialInstruction=item.special_instruction;
-      comments=item.comments;
-      tipAmount=item.tip_amount;
       id=item.id;
-            
+      modifierGroupName=item.modifier_group_name;
+      minRequired=item.min_required;
+      maxAllowed=item.max_allowed;
+      createdDate=item.createdDate;  
+      updatedDate=item.updatedDate;          
     } catch(e) { console.error(e); } 
     return (            
         <View>                
           <Card style={{width: '95%', padding: 10, margin: 10, backgroundColor:'#F6FAFE'}}>
             <TouchableOpacity onPress={() =>{toggleModalVisibility}} style={styles.rowFront} underlayColor={'#fff'}>
-              <Text style={styles.itemStyle}>{"Table Number : "+ tableid }</Text>  
-              <Text style={styles.itemStyle}>{"Seats : "+ seats}</Text>
-              <Text style={styles.itemStyle}>{"Amount : $"+ amount }</Text>
-              <Text style={styles.itemStyle}>{"Comments : "+ comments }</Text>            
-              <Text style={styles.itemStyle}>{"Special Instruction : "+ specialInstruction}</Text>
-              <Text style={styles.itemStyle}>{"Tip Amount : $"+ tipAmount}</Text>
-              <Text style={styles.itemStyle}>{"Order Date Time : "+ moment(orderdatetime).format("MM-DD-YYYY hh:mma")}</Text>
-              <Text style={styles.itemStyle}>{"Update Date Time : "+ moment(updatedatetime).format("MM-DD-YYYY hh:mma")}</Text>
-              <Text style={styles.itemStyle}>{"Completed Date Time : "+ moment(completeddatetime).format("MM-DD-YYYY hh:mma")}</Text>
+              <Text style={styles.itemStyle}>{"ModifierGroup ID : "+ id}</Text> 
+              <Text style={styles.itemStyle}>{"Modifier Group Name : "+ modifierGroupName }</Text>  
+              <Text style={styles.itemStyle}>{"Minimum Required : "+ minRequired}</Text>
+              <Text style={styles.itemStyle}>{"Maximum Allowed : "+ maxAllowed}</Text>
+              <Text style={styles.itemStyle}>{"Created Date : "+ moment(createdDate).format("MM-DD-YYYY hh:mma") }</Text>
+              <Text style={styles.itemStyle}>{"Updated Date : "+ moment(updatedDate).format("MM-DD-YYYY hh:mma") }</Text> 
             </TouchableOpacity>
           </Card>          
         </View>
@@ -104,8 +97,8 @@ return unsubscribe;
 
 
   const deleteOrder = (data) => {      
-    console.log('Delete Order',data.item.id);
-    let dataToSend = {order_id: data.item.id};
+    console.log('Delete Modifier Group',data.item.id);
+    let dataToSend = {modifier_id: data.item.id};
     let formBody = [];
     for (let key in dataToSend) {
       let encodedKey = encodeURIComponent(key);
@@ -114,7 +107,7 @@ return unsubscribe;
     }
     formBody = formBody.join('&');
 
-    fetch(`http://testweb.izaap.in/moop/api/index.php/service/orders/remove?X-API-KEY=MoopApp2021@!&order_id=${data.item.id}`, {
+    fetch(`http://testweb.izaap.in/moop/api/index.php/service/modifier_group/remove?X-API-KEY=MoopApp2021@!&modifier_id=${data.item.id}`, {
       method: 'GET',
       
       headers: {
@@ -131,7 +124,7 @@ return unsubscribe;
         } else {          
           if(responseJson.message === 'No Orders Found!')
           {
-            Alert.alert('Order Deleted Successfully')
+            Alert.alert('Modifier Group Deleted Successfully')
           }            
         }
       })
@@ -143,6 +136,17 @@ return unsubscribe;
       });
   };
  
+
+  const getModifierGroupDetail = (rowMap, rowKey, data) => {
+    console.log('Order Get Detail - Delete **-', data.item.id)
+    console.log('Order Key', rowKey)
+    //navigation.navigate('AddModifierGroupStack',{Screen:'AddModifierGroup'})
+    navigation.navigate('AddModifierGroupStack',{
+        screen: 'AddModifierGroup', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
 
   const deleteItem = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
@@ -156,64 +160,18 @@ return unsubscribe;
   };
 
 
-  const getOrderDetail = (rowMap, rowKey, data) => {
-    console.log('Order Get Detail - Delete **-', data.item.id)
-    console.log('Order Key', rowKey)
-    navigation.navigate('AddUpdatePageStack',{
-        screen: 'AddUpdatePage', 
-        params: {data: data, operation: 'update'},
-    });
-    // navigation.navigate('SecondPage', {
-    //   paramKey: userName,
-    // })
-    //
-    // fetch(`http://testweb.izaap.in/moop/api/index.php/service/orders/view?X-API-KEY=MoopApp2021@!&order_id=${data.item.id}`,{
-    //     method: 'GET'
-    //     //Request Type 
-    //     })
-    //     .then((response) => response.json())
-    //     .then((responseJson) => {
-    //       //console.log(responseJson);
-    //       return responseJson.data;
-    //     })
-    //     .then( data  => {
-    //           //setListData(data);    
-    //           console.log('OrderDetails',data);
-    //           if(data != undefined){ 
-    //                  // data.map((item, index)=>{                          
-    //                   //const obj = JSON.parse(item.menujson);      
-    //               //     obj.map((objitem, index)=>{       
-    //               // })       
-    //              // })
-    //           }
-    //           else
-    //           {
-    //             console.log('No Data Found');
-    //             Alert.alert('No Data Found');
-    //           } 
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-
-    //console.log('RowMap - *** ', rowMap._dispatchInstances._debugOwner)
-    //console.log('Order Get Detail - Row Key', rowMap)
-    
-  }
-
 
   const renderHiddenItem = (data, rowMap) => {
-    console.log("Data Item ID", data.item.id);
-    console.log("Row Map", rowMap);
-    console.log("Data", data);
-
-    return (
+    console.log(data.item.id);
+    console.log(rowMap, data);
+    return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() => {getOrderDetail(rowMap, data.item.key, data)}}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() => {getModifierGroupDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.actionButton, styles.deleteBtn]} onPress={() => {        
+      <TouchableOpacity style={[styles.actionButton, styles.deleteBtn]} onPress={() => {
+        
         Alert.alert(
           'Alert',
           'Are you sure you want to delete ?',
@@ -223,7 +181,7 @@ return unsubscribe;
               deleteItem(rowMap, data.item.key, data);
             }}
           ],
-          { cancelable: true }
+          { cancelable: true}
         );
         }
       }
@@ -236,8 +194,7 @@ return unsubscribe;
 
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-    <View style={styles.container}>      
+    <View style={styles.container}>
       <TextInput
             style={styles.textInputStyle}
             onChangeText={(text) => searchFilterFunction(text)}
@@ -248,11 +205,11 @@ return unsubscribe;
           
 
         <View  style={styles.headerView}>
-          <Text style={styles.txt}>
-              Orders
+        <Text style={styles.txt}>
+              Modifier Groups
           </Text>
         </View>
-          
+
       <SwipeListView
             data={listData}
             keyExtractor={(item, index) => index.toString()}
@@ -263,14 +220,13 @@ return unsubscribe;
             previewRowKey={'0'}
             previewOpenValue={-40}
             previewOpenDelay={3000}
-            onRowDidOpen={onItemOpen}   
-            disableRightSwipe={true}         
+            onRowDidOpen={onItemOpen}
+            
       />
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddUpdatePageStack',{Screen:'AddUpdatePage', params: {operation:'add'}})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddModifierGroupStack',{Screen:'AddModifierGroup', params: {operation:'add'}})}>
           <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
-    </SafeAreaView>
   );
 }
 
@@ -283,34 +239,19 @@ const styles = StyleSheet.create({
   list: {
     color: '#FFF',
   },
+
   btnText: {
     color: '#FFF',
     textShadowColor: 'white',    
   },
-  txt:{
-    //paddingLeft:100,
-    fontSize:22,
-    fontWeight:'bold',    
-  },
-  headerView:{    
-    alignItems: 'center',    
-  },
-  textInputStyle: {
-    height: 40,
-    borderWidth: 2,
-    paddingLeft: 20,
-    borderRadius:10,
-    margin: 5,
-    borderColor: '#5F6160',
-    backgroundColor: '#F6FAFE',
-  },
+
   rowFront: {
     //alignItems: 'center',
     //backgroundColor: 'lightcoral',
     //borderBottomColor: 'black',
     //borderBottomWidth: 0.5,
     //justifyContent: 'center',
-    height: 180,
+    //height: 180,
   },
   rowBack: {
     alignItems: 'center',
@@ -333,7 +274,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'blue',
     //bottom: 40,
     right: 80,
-    //width: 75,    
+    //width: 75,
+    
     //top: 20,
     // height: '100%'
   },
@@ -342,9 +284,9 @@ const styles = StyleSheet.create({
     right: 10,
   },
   addButtonText:{
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white'
+fontSize: 20,
+fontWeight: 'bold',
+color: 'white'
   },
   addButton:{
     position:'absolute',
@@ -386,5 +328,22 @@ const styles = StyleSheet.create({
 itemStyle: {
   padding: 3,
   fontSize: 10,
+},
+txt:{
+  //paddingLeft:100,
+  fontSize:22,
+  fontWeight:'bold',    
+},
+headerView:{    
+  alignItems: 'center',    
+},
+textInputStyle: {
+  height: 40,
+  borderWidth: 2,
+  paddingLeft: 20,
+  borderRadius:10,
+  margin: 5,
+  borderColor: '#5F6160',
+  backgroundColor: '#F6FAFE',
 },
 });

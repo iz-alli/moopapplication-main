@@ -3,18 +3,14 @@ import React, { Component } from 'react';
 import { StyleSheet, Alert, View, Button, Picker,Text,TextInput,TouchableOpacity,Modal} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
  
-export default class AddMenuType extends Component{
+export default class AddModifierGroup extends Component{
  
   constructor(props){ 
     super(props); 
-
-    var modifierGroupNameInfo;    
-    var minRequiredInfo;
-    var maxAllowedInfo;
-    var modifierNameInfo;
-    var modifierPriceInfo;
-    var modifierAltNameInfo;  
-    var modifierIdInfo;
+    var modifierGroupNameInfo;
+    var minRequiredInfo;  
+    var maxAllowedInfo; 
+    var modifier_group_idInfo;   
 
     this.state={ 
       PickerValueHolder : '' 
@@ -26,8 +22,7 @@ export default class AddMenuType extends Component{
       TextInputValue1: '',      
     }    
   }
-  
- 
+
   componentWillMount(){
     
     this.props.navigation.addListener('focus', () => {
@@ -36,34 +31,23 @@ export default class AddMenuType extends Component{
       if(this.oper === "update")
       {
         console.log("update")
-        this.modifierIdInfo = this.props.route.params?.data.item.id ?? '';
-        this.modifierGroupNameInfo = this.props.route.params?.data.item.modifier_group_name ?? 'Modifier Group Name';
-        this.minRequiredInfo = this.props.route.params?.data.item.min_required ?? '0';
-        this.maxAllowedInfo = this.props.route.params?.data.item.max_allowed ?? '0';
-        this.modifierNameInfo = this.props.route.params?.data.item.modifier_name ?? 'Modifier Name';
-        this.modifierPriceInfo = this.props.route.params?.data.item.modifier_price ?? '0.00';
-        this.modifierAltNameInfo = this.props.route.params?.data.item.modifier_alt_name ?? 'Modifier Alt Name';
+        this.modifier_group_idInfo = this.props.route.params?.data.item.id ?? 'defaultValue';
+        this.modifierGroupNameInfo = this.props.route.params?.data.item.modifier_group_name ?? '0';
+        this.minRequiredInfo = this.props.route.params?.data.item.min_required ?? 'Enter Table No';
+        this.maxAllowedInfo = this.props.route.params?.data.item.max_allowed ?? 'Special Instruction';        
 
-        this.setState({modifierId: this.modifierIdInfo}); 
+        this.setState({modifier_group_id: this.modifier_group_idInfo}); 
         this.setState({modifierGroupName: this.modifierGroupNameInfo});
         this.setState({minRequired: this.minRequiredInfo});
-        this.setState({maxAllowed: this.maxAllowedInfo});
-        this.setState({modifierName: this.modifierNameInfo});
-        this.setState({modifierPrice: this.modifierPriceInfo});
-        this.setState({modifierAltName: this.modifierAltNameInfo});
-
-       
+        this.setState({maxAllowed: this.maxAllowedInfo});        
         }
         else{
           console.log("add")
-          this.setState({modifierId: ''}); 
+          this.setState({modifier_group_idInfo: ''}); 
           this.setState({modifierGroupName: ''});
-          this.setState({minRequired: ''});
-          this.setState({maxAllowed: ''});
-          this.setState({modifierName: ''});
-          this.setState({modifierPrice: ''});
-          this.setState({modifierAltName: ''});
-  
+          this.setState({minRequiredInfo: ''});
+          this.setState({maxAllowedInfo: ''});
+          
         }
     });    
   }
@@ -71,18 +55,16 @@ export default class AddMenuType extends Component{
   componentDidMount() {        
     this.props.navigation.addListener('focus', () => {
       console.log("componentDidMount")   
-      console.log("data1", this.modifierIdInfo)
-      console.log("data1", this.modifierGroupNameInfo)
-      console.log("data1", this.minRequiredInfo)
-      console.log("data1", this.maxAllowedInfo)
-      console.log("data1", this.modifierNameInfo)
-      console.log("data1", this.modifierPriceInfo)
-      console.log("data1", this.modifierAltNameInfo)
+      console.log("data1", this.modifier_group_idInfo)
+      console.log("data1", this.minRequired)
+      console.log("data1", this.maxAllowed)
+      console.log("data1", this.modifierGroupName)
+     
     });
     //this.fetchData();     
   }
 
-
+ 
   GetSelectedPickerItem=()=>{ 
     Alert.alert(this.state.PickerValueHolder);
   }
@@ -90,12 +72,9 @@ export default class AddMenuType extends Component{
   state = {  
     isVisible: true, //state of modal default false  
     modifierGroupName: '',
-    minRequired:'',
-    maxAllowed:'',
-    modifierName:'',
-    modifierPrice:'',
-    modifierAltName:'',
-    modifierId:'',
+    minRequired:'',  
+    maxAllowed:'', 
+    modifier_group_id:'',   
   }  
   buttonClickListener = () =>{
     const { TextInputValue }  = this.state;       
@@ -103,23 +82,17 @@ export default class AddMenuType extends Component{
 }
 
 addOrder =()=>{
+  //console.log('AddLabel'+ this.state.labelName)
   console.log("Operation", this.oper)
   if(this.oper === "add")
   {
       console.log("Add Operation")
-      console.log('AddMenuType'+ this.state.modifierGroupName)
       var dataToSend = {
         user_id:251,
         rest_id:3,
-        seats:3,
-        status:1,
         modifier_group_name:this.state.modifierGroupName,
-        parentid:0,
         min_required:this.state.minRequired,
         max_allowed:this.state.maxAllowed,
-        modifier_name:this.state.modifierName,
-        modifier_alt_name:this.state.modifierAltName,
-        modifier_price:this.state.modifierPrice,
       };
       var formBody = [];
       for (var key in dataToSend) {
@@ -128,8 +101,8 @@ addOrder =()=>{
         formBody.push(encodedKey + '=' + encodedValue);
       }
       formBody = formBody.join('&');
-
-      fetch('http://testweb.izaap.in/moop/api/index.php/service/modifiers/add?X-API-KEY=MoopApp2021@!', {
+    
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/modifier_group/add?X-API-KEY=MoopApp2021@!&', {
         method: 'POST',
         body: formBody,
         headers: {
@@ -144,11 +117,11 @@ addOrder =()=>{
           console.log(responseJson);
           // If server response message same as Data Matched
           if (responseJson.status == "success") {
-            Alert.alert('Modifier has been Added successfully');
-            console.log('Modifier has been Added successfully');
-            this.props.navigation.navigate('ModifierStack',{Screen:'Modifier'})
+            Alert.alert('Modifier Group has been Added successfully');
+            console.log('Modifier Group has been Added successfully');
+            this.props.navigation.navigate('ModifierGroupStack',{Screen:'ModifierGroup'})
           } else {
-            console.log("Error")
+            setErrortext('Error');
           }
         })
         .catch((error) => {
@@ -159,20 +132,13 @@ addOrder =()=>{
   }
   else{
     console.log("Update Operation")
-    console.log('AddMenuType'+ this.state.modifierGroupName)
     var dataToSend = {
       user_id:251,
       rest_id:3,
-      seats:3,
-      status:1,
       modifier_group_name:this.state.modifierGroupName,
-      parentid:0,
       min_required:this.state.minRequired,
       max_allowed:this.state.maxAllowed,
-      modifier_name:this.state.modifierName,
-      modifier_alt_name:this.state.modifierAltName,
-      modifier_price:this.state.modifierPrice,
-      modifier_id: this.state.modifierId,
+      modifier_id:this.state.modifier_group_id,
     };
     var formBody = [];
     for (var key in dataToSend) {
@@ -181,8 +147,8 @@ addOrder =()=>{
       formBody.push(encodedKey + '=' + encodedValue);
     }
     formBody = formBody.join('&');
-
-    fetch('http://testweb.izaap.in/moop/api/index.php/service/modifiers/update?X-API-KEY=MoopApp2021@!', {
+  
+    fetch('http://testweb.izaap.in/moop/api/index.php/service/modifier_group/update?X-API-KEY=MoopApp2021@!&', {
       method: 'POST',
       body: formBody,
       headers: {
@@ -197,9 +163,9 @@ addOrder =()=>{
         console.log(responseJson);
         // If server response message same as Data Matched
         if (responseJson.status == "success") {
-          Alert.alert('Modifier has been Updated successfully');
-          console.log('Modifier has been Updated successfully');
-          this.props.navigation.navigate('ModifierStack',{Screen:'Modifier'})
+          Alert.alert('Modifier Group has been Updated successfully');
+          console.log('Modifier Group has been Updated successfully');
+          this.props.navigation.navigate('ModifierGroupStack',{Screen:'ModifierGroup'})
         } else {
           setErrortext('Error');
         }
@@ -209,17 +175,17 @@ addOrder =()=>{
         //setLoading(false);
         console.error(error);
       });
-    }  
+  }
+  
 }
 
  render() {
    return (
         <View style={styles.container}>
         <View>
-        <ScrollView>
-
+        <ScrollView> 
               <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
+                    <Text style={{  flex: 1, padding: 5, fontSize:18, fontWeight:'bold'}}>
                     {'Modifier Group Name'}
                     </Text>   
                     <TextInput
@@ -243,7 +209,7 @@ addOrder =()=>{
               <View style={{height: 10}} />
 
               <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
+                    <Text style={{  flex: 1, padding: 5, fontSize:18, fontWeight:'bold'}}>
                     {'Minimum Required'}
                     </Text>   
                     <TextInput
@@ -265,10 +231,11 @@ addOrder =()=>{
                     />
               </View>
 
-              <View style={{height: 10}} />
+
+              <View style={{flexirection:'row', top:20, alignContent: 'center'}}>        
 
               <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
+                    <Text style={{  flex: 1, padding: 5, fontSize:18, fontWeight:'bold'}}>
                     {'Maximum Allowed'}
                     </Text>   
                     <TextInput
@@ -289,89 +256,12 @@ addOrder =()=>{
                         }}
                     />
               </View>
-
-              <View style={{height: 10}} />
-
-
-              <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
-                    {'Modifier Name'}
-                    </Text>   
-                    <TextInput
-                        placeholder='Modifier Name'
-                        placeholderTextColor='#303030'
-                        onChangeText={(modifierName) => this.setState({ modifierName })}
-                        value={this.state.modifierName}
-                        style={{
-                        borderWidth: 1,
-                        borderRadius:10,
-                        borderColor: '#000',
-                        flex: 1,
-                        padding: 15,
-                        //right:70,
-                        width:100,
-                        height:50   
-                        }}
-                    />
-              </View>
-
-              <View style={{height: 10}} />
-
-              <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
-                    {'Modifier Price'}
-                    </Text>   
-                    <TextInput
-                        placeholder='Modifier Price'
-                        placeholderTextColor='#303030'
-                        keyboardType='numeric'
-                        onChangeText={(modifierPrice) => this.setState({ modifierPrice })}
-                        value={this.state.modifierPrice}
-                        style={{
-                        borderWidth: 1,
-                        borderRadius:10,
-                        borderColor: '#000',
-                        flex: 1,
-                        padding: 15,
-                        //right:70,
-                        width:100,
-                        height:50   
-                        }}
-                    />
-              </View>
-
-              <View style={{height: 10}} />
-
-              <View style={{flexDirection: 'row',top:20}}>
-                    <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
-                    {'Modifier Alt Name'}
-                    </Text>   
-                    <TextInput
-                        placeholder='Modifier Alt Name'
-                        placeholderTextColor='#303030'
-                        onChangeText={(modifierAltName) => this.setState({ modifierAltName })}
-                        value={this.state.modifierAltName}
-                        style={{
-                        borderWidth: 1,
-                        borderRadius:10,
-                        borderColor: '#000',
-                        flex: 1,
-                        padding: 15,
-                        //right:70,
-                        width:100,
-                        height:50   
-                        }}
-                    />
-              </View>
-
-              <View style={{height: 10}} />
-
-              <View style={{flexirection:'row', top:35}}>                         
+                   
         </View>
 
         
             <TouchableOpacity style={styles.btn1}>
-                <Text style={styles.btnTxt} onPress = {this.addOrder}>Add/Update Modifier</Text>
+                <Text style={styles.btnTxt} onPress = {this.addOrder}>Add/Update ModifierGroup</Text>
             </TouchableOpacity>
             </ScrollView>
             </View>

@@ -20,9 +20,12 @@ import Modifiers from './Modifiers';
 import orderScreen from './OrderScreen';
 import ReportsScreen from './ReportsScreen';
 import Employee from './Employee';
+import ModifierGroup from './ModifierGroup';
 import ExpandableViewSeparate from './ExpandableViewSeparate';
 import CustomSidebarMenu from '../Components/CustomSidebarMenu';
 import NavigationDrawerHeader from '../Components/NavigationDrawerHeader';
+import OrderNavigationDrawer from '../Components/OrderNavigationDrawer';
+import DefaultNavDrawerHeader from '../Components/DefaultNavDrawerHeader';
 import Tables from './Tables';
 import Transaction from './Transaction';
 import AddUpdatePage from '../DrawerScreens/AddUpdatePage';
@@ -31,6 +34,9 @@ import AddMenuType from './AddMenuType';
 import AddModifier from './AddModifier';
 import AddCategory from './AddCategory';
 import AddTable from './AddTables';
+import AddLabel from './AddLabel';
+import AddEmployee from './AddEmployee';
+import AddModifierGroup from './AddModifierGroup';
 import {Button, StyleSheet, Image,View, Linking} from 'react-native';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -45,7 +51,7 @@ const homeScreenStack = ({navigation}) => {
         options={{
           title: 'Home', //Set Header Title
           headerLeft: () => (
-            <NavigationDrawerHeader navigationProps={navigation} />
+            <DefaultNavDrawerHeader navigationProps={navigation} />
           ),
           headerStyle: {
             backgroundColor: '#DB3133', //Set Header color
@@ -66,7 +72,7 @@ const employeeStack = ({navigation}) => {
       initialRouteName="Employee"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          <DefaultNavDrawerHeader navigationProps={navigation} />
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -86,13 +92,41 @@ const employeeStack = ({navigation}) => {
     </Stack.Navigator>
   );
 };
+
+const modifierGroupStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="ModifierGroup"
+      screenOptions={{
+        headerLeft: () => (
+          <DefaultNavDrawerHeader navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#DB3133', //Set Header color
+        },
+        headerTintColor: '#fff', //Set Header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', //Set Header text style
+        },
+      }}>
+      <Stack.Screen
+        name="ModifierGroup"
+        component={ModifierGroup}
+        options={{
+          title: 'ModifierGroup', //Set Header Title
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const tablesStack = ({navigation}) => {
   return (
     <Stack.Navigator
       initialRouteName="Tables"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          <DefaultNavDrawerHeader navigationProps={navigation} />
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -119,7 +153,7 @@ const transactionScreenStack = ({navigation}) => {
       initialRouteName="Transaction"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          <DefaultNavDrawerHeader navigationProps={navigation} />
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -146,7 +180,9 @@ const orderScreenStack = ({navigation}) => {
       initialRouteName="orderScreen"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          
+          <OrderNavigationDrawer navigationProps={navigation} />
+          
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -208,7 +244,7 @@ const reportsScreenStack = ({navigation}) => {
       initialRouteName="ReportsScreen"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          <DefaultNavDrawerHeader navigationProps={navigation} />
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -375,7 +411,7 @@ const AddUpdatePageStack = ({navigation}) => {
       initialRouteName="AddUpdatePage"
       screenOptions={{
         headerLeft: () => (
-          <NavigationDrawerHeader navigationProps={navigation} />
+          <OrderNavigationDrawer navigationProps={navigation} />
         ),
         headerStyle: {
           backgroundColor: '#DB3133', //Set Header color
@@ -388,10 +424,7 @@ const AddUpdatePageStack = ({navigation}) => {
       <Stack.Screen
         name="AddUpdatePage"
         component={AddUpdatePage}
-        options={{
-          title: 'Add/Update', //Set Header Title
-          
-        }}
+        
       />
     </Stack.Navigator>
   );
@@ -532,6 +565,117 @@ const AddTableStack = ({navigation}) => {
   );
 };
 
+
+const AddLabelStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="AddLabel"
+      screenOptions={{
+        headerLeft: () => (
+          <NavigationDrawerHeader navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#DB3133', //Set Header color
+        },
+        headerTintColor: '#fff', //Set Header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', //Set Header text style
+        },
+      }}>
+      <Stack.Screen
+        name="AddLabel"
+        component={AddLabel}
+        options={{
+          title: 'Add/Update Label', //Set Header Title          
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+
+const AddEmployeeStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="AddEmployee"
+      screenOptions={{
+        headerLeft: () => (
+          <NavigationDrawerHeader navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#DB3133', //Set Header color
+        },
+        headerTintColor: '#fff', //Set Header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', //Set Header text style
+        },
+      }}>
+      <Stack.Screen
+        name="AddEmployee"
+        component={AddEmployee}
+        options={{
+          title: 'Add/Update Employee', //Set Header Title          
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+
+const AddModifierGroupStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="AddModifierGroup"
+      screenOptions={{
+        headerLeft: () => (
+          <NavigationDrawerHeader navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#DB3133', //Set Header color
+        },
+        headerTintColor: '#fff', //Set Header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', //Set Header text style
+        },
+      }}>
+      <Stack.Screen
+        name="AddModifierGroup"
+        component={AddModifierGroup}
+        options={{
+          title: 'Add/Update ModifierGroup', //Set Header Title          
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ProfilePageStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="ProfilePage"
+      screenOptions={{
+        headerLeft: () => (
+          <DefaultNavDrawerHeader navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#DB3133', //Set Header color
+        },
+        headerTintColor: '#fff', //Set Header text color
+        headerTitleStyle: {
+          fontWeight: 'bold', //Set Header text style
+        },
+      }}>
+      <Stack.Screen
+        name="ProfilePage"
+        component={ProfilePage}
+        options={{
+          title: 'Profile Page', //Set Header Title          
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 function getExpandableView(props){
   return (
       <ExpandableViewSeparate navObj={props.navigation}/>
@@ -620,6 +764,12 @@ const DrawerNavigatorRoutes = (props) => {
       component={ModifiersStack}
       />
 
+    <Drawer.Screen
+      name="ModifierGroupStack"
+      options={{drawerLabel:"ModifierGroup"}}
+      component={modifierGroupStack}
+      />
+
       <Drawer.Screen
       name="CategoriesStack"
       options={{drawerLabel:"Categories"}}
@@ -662,7 +812,29 @@ const DrawerNavigatorRoutes = (props) => {
       options={{drawerLabel:()=>null}}
       component={AddTableStack}/>
 
+    <Drawer.Screen
+      name="AddLabelStack"
+      options={{drawerLabel:()=>null}}
+      component={AddLabelStack}/>
+
+    <Drawer.Screen
+        name="AddEmployeeStack"
+        options={{drawerLabel:()=>null}}
+        component={AddEmployeeStack}/>
+
+
+    <Drawer.Screen
+        name="AddModifierGroupStack"
+        options={{drawerLabel:()=>null}}
+        component={AddModifierGroupStack}/>
+
+    <Drawer.Screen
+      name="ProfilePageStack"
+      options={{drawerLabel:()=>null}}
+      component={ProfilePageStack}/>
      </Drawer.Navigator>
+
+
   );
 };
 

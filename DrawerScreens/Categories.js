@@ -3,7 +3,8 @@
 
 // import React in our code
 import React, {useState, useEffect,Component} from 'react';
-       
+import { SwipeListView } from 'react-native-swipe-list-view';    
+
 // import all the components we are going to use
 import {
   SafeAreaView,
@@ -28,6 +29,7 @@ const Categories = ({navigation}) =>
 		setModalVisible(!isModalVisible);
     };
   const [count, setCount] = React.useState(0);
+  const [listData, setListData] = useState([]);
   const [search, setSearch] = useState('');
   const [filteredDataSource, setFilteredDataSource] = useState([]);
   const [masterDataSource, setMasterDataSource] = useState([]);
@@ -51,7 +53,7 @@ const Categories = ({navigation}) =>
             return responseJson.data;
           })
           .then( data  => {
-                setMasterDataSource(data);  
+                setListData(data);  
                 if(data != undefined){     
                   data.map((item, index)=>{  
                     
@@ -87,6 +89,16 @@ const Categories = ({navigation}) =>
     console.log('This row opened', rowKey);
   };
     
+  const getCategoryDetail = (rowMap, rowKey, data) => {
+    console.log('Category Get Detail - Delete **-', data.item.id)
+    console.log('Category Key', rowKey)    
+    navigation.navigate('AddCategoryStack',{
+        screen: 'AddCategory', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
+
   const deleteItems = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
     closeItem(rowMap, rowKey);
@@ -145,9 +157,10 @@ const Categories = ({navigation}) =>
     console.log(rowMap, data);
     return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>navigation.navigate('AddUpdatePageStack',{Screen:'AddUpdatePage'})}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>{getCategoryDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
+
 
       <TouchableOpacity style={[styles.actionButton, styles.deleteBtn]} onPress={() => {
         
@@ -194,10 +207,10 @@ const Categories = ({navigation}) =>
         <View>
           <Card style={{width: '95%', padding: 10, margin: 10, backgroundColor:'#F6FAFE'}}>
           <TouchableOpacity onPress={() => getItem(item)} >
-            <Text style={styles.itemStyle}>{"Category Title : "+ title}</Text>  
-            <Text style={styles.itemStyle}>{"Category Description : "+ description }</Text>
-            <Text style={styles.itemStyle}>{"Category Tax : "+ categoryTax }</Text>
-            <Text style={styles.itemStyle}>{"Status : "+ status }</Text>
+            <Text style={styles.itemStyle}>{"Category Title: "+ title}</Text>  
+            <Text style={styles.itemStyle}>{"Category Description: "+ description }</Text>
+            <Text style={styles.itemStyle}>{"Category Tax: "+ categoryTax }</Text>
+            <Text style={styles.itemStyle}>{"Status: "+ status }</Text>
           </TouchableOpacity>
           </Card>
         </View>
@@ -221,45 +234,38 @@ const Categories = ({navigation}) =>
   return (
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
-          <TextInput
+         
+        <TextInput
             style={styles.textInputStyle}
             onChangeText={(text) => searchFilterFunction(text)}
             value={search}
             underlineColorAndroid="transparent"
             placeholder="Search Here"
           />
-        <View>
-        <Modal animationType="slide"
-          transparent visible={isModalVisible}
-          presentationStyle="overFullScreen"
-          onDismiss={toggleModalVisibility}>
-          <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-              <TextInput placeholder="Item"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <TextInput placeholder="Price"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <Button title="Add" onPress={toggleModalVisibility} />
-            </View>
-          </View>
-        </Modal>
-        </View>
+          
+          
+        <View  style={styles.headerView}>
           <Text style={styles.txt}>
               Categories
           </Text>
-          <FlatList
-            data={masterDataSource}
+          </View>
+          
+           <SwipeListView
+            data={listData}
             keyExtractor={(item, index) => index.toString()}
-            ItemSeparatorComponent={ItemSeparatorView}
             renderItem={ItemView}
-          />
+            renderHiddenItem={renderHiddenItem}
+            leftOpenValue={200}
+            rightOpenValue={-150}
+            previewRowKey={'0'}
+            previewOpenValue={-40}
+            previewOpenDelay={3000}
+            onRowDidOpen={onItemOpen} 
+            disableRightSwipe={true}            
+      />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddCategoryStack',{Screen:'AddCategory'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddCategoryStack',{Screen:'AddCategory', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -278,12 +284,20 @@ const styles = StyleSheet.create({
     },
     textInputStyle: {
       height: 40,
-      borderWidth: 3,
+      borderWidth: 2,
       paddingLeft: 20,
       borderRadius:10,
       margin: 5,
-      borderColor: '#009688',
-      backgroundColor: 'yellow',
+      borderColor: '#5F6160',
+      backgroundColor: '#F6FAFE',
+    },
+    txt:{
+      //paddingLeft:100,
+      fontSize:22,
+      fontWeight:'bold',    
+    },
+    headerView:{    
+      alignItems: 'center',    
     },
     container2:{
         flex: 1,
@@ -291,17 +305,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15
     },
-    txt:{
-      paddingLeft:100,
-      fontSize:22,
-      fontWeight:'bold'
-    },
+    
     addButton:{
       position:'absolute',
       zIndex:11,
       right:20,
       bottom:50,
-      backgroundColor:'#307ecc',
+      backgroundColor:'#DB3133',
       width:80,
       height:80,
       borderRadius:50,
@@ -310,9 +320,10 @@ const styles = StyleSheet.create({
       elevation:8,
     },
     addButtonText:{
-    color:'#fff',
-    fontSize:24,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+     },
     modalContent: {
       backgroundColor: 'white',
       padding: 22,

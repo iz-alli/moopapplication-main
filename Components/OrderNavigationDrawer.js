@@ -5,9 +5,8 @@
 import React from 'react';
 import {View, Image, TouchableOpacity, Alert,StyleSheet,Text} from 'react-native';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const NavigationDrawerHeader = (props) => {
+const OrderNavigationDrawer = (props) => {
   const toggleDrawer = () => {
     props.navigationProps.toggleDrawer();
   };
@@ -30,13 +29,9 @@ const NavigationDrawerHeader = (props) => {
                   <Text onPress={() => _menu1.show()} style={props.textStyle}>{props.menutext}</Text>
                 )
               }>
-            <MenuItem onPress={() => props.navigationProps.navigate('MenuItemStack',{Screen:'MenuItem'})}>Menu Items</MenuItem>
-            <MenuItem onPress={() => props.navigationProps.navigate('MenuTypeStack',{Screen:'MenuType'})}>Menu Types</MenuItem>
+            <MenuItem onPress={() => {Alert.alert('Open Order Clicked...')}}>Open Order</MenuItem>            
             <MenuDivider />
-            <MenuItem onPress={() => props.navigationProps.navigate('ModifierStack',{Screen:'Modifier'})}>Modifiers</MenuItem>
-            <MenuItem onPress={() => props.navigationProps.navigate('ModifierGroupStack',{Screen:'ModifierGroup'})}>ModifierGroup</MenuItem>
-            <MenuItem onPress={() => props.navigationProps.navigate('CategoriesStack',{Screen:'Categories'})}>Categories</MenuItem>
-            <MenuItem onPress={() => props.navigationProps.navigate('LabelsStack',{Screen:'Labels'})}>Labels</MenuItem>
+            <MenuItem onPress={() => {Alert.alert('Completed Order Clicked...')}}>Completed Order</MenuItem>            
           </Menu>       
         </View>
 
@@ -54,7 +49,7 @@ const NavigationDrawerHeader = (props) => {
   );  
 };
 
-export default NavigationDrawerHeader;
+export default OrderNavigationDrawer;
 
 const styles = StyleSheet.create({
   main: {

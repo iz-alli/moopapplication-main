@@ -89,6 +89,16 @@ const Modifiers = ({navigation}) =>
     console.log('This row opened', rowKey);
   };
 
+  const getModifierDetail = (rowMap, rowKey, data) => {
+    console.log('Order Get Detail - Delete **-', data.item.id)
+    console.log('Order Key', rowKey)
+    navigation.navigate('AddModifierStack',{
+        screen: 'AddModifier', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
+
   const deleteItems = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
     closeItem(rowMap, rowKey);
@@ -102,8 +112,8 @@ const Modifiers = ({navigation}) =>
 
 
   const deleteModifier = (data) => {      
-    console.log('Delete Order',data.item.id);
-    let dataToSend = {order_id: data.item.id};
+    console.log('Delete Modifier',data.item.id);
+    let dataToSend = {modifier_id: data.item.id};
     let formBody = [];
     for (let key in dataToSend) {
       let encodedKey = encodeURIComponent(key);
@@ -147,7 +157,7 @@ const Modifiers = ({navigation}) =>
     console.log(rowMap, data);
     return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>navigation.navigate('AddUpdatePageStack',{Screen:'AddUpdatePage'})}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>{getModifierDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
 
@@ -230,29 +240,11 @@ const Modifiers = ({navigation}) =>
             underlineColorAndroid="transparent"
             placeholder="Search Here"
           />
-        <View>
-        <Modal animationType="slide"
-          transparent visible={isModalVisible}
-          presentationStyle="overFullScreen"
-          onDismiss={toggleModalVisibility}>
-          <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-              <TextInput placeholder="Item"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <TextInput placeholder="Price"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <Button title="Add" onPress={toggleModalVisibility} />
-            </View>
-          </View>
-        </Modal>
-        </View>
+        <View  style={styles.headerView}>
           <Text style={styles.txt}>
               Modifiers
           </Text>
+          </View>
           <SwipeListView
             data={listData}
             keyExtractor={(item, index) => index.toString()}
@@ -263,11 +255,12 @@ const Modifiers = ({navigation}) =>
             previewRowKey={'0'}
             previewOpenValue={-40}
             previewOpenDelay={3000}
-            onRowDidOpen={onItemOpen}            
+            onRowDidOpen={onItemOpen}  
+            disableRightSwipe={true}           
           />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddModifierStack',{Screen:'AddModifier'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddModifierStack',{Screen:'AddModifier', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -286,12 +279,12 @@ const styles = StyleSheet.create({
     },
     textInputStyle: {
       height: 40,
-      borderWidth: 3,
+      borderWidth: 2,
       paddingLeft: 20,
       borderRadius:10,
       margin: 5,
-      borderColor: '#009688',
-      backgroundColor: 'yellow',
+      borderColor: '#5F6160',
+      backgroundColor: '#F6FAFE',
     },
     container2:{
         flex: 1,
@@ -300,16 +293,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     txt:{
-      paddingLeft:100,
+      //paddingLeft:100,
       fontSize:22,
-      fontWeight:'bold'
+      fontWeight:'bold',    
+    },
+    headerView:{    
+      alignItems: 'center',    
     },
     addButton:{
       position:'absolute',
       zIndex:11,
       right:20,
       bottom:50,
-      backgroundColor:'#307ecc',
+      backgroundColor:'#DB3133',
       width:80,
       height:80,
       borderRadius:50,
@@ -318,9 +314,11 @@ const styles = StyleSheet.create({
       elevation:8,
     },
     addButtonText:{
-    color:'#fff',
-    fontSize:24,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+     },
+
     modalContent: {
       backgroundColor: 'white',
       padding: 22,

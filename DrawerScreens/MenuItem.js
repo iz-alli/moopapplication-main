@@ -3,7 +3,7 @@
 
 // import React in our code
 import React, {useState, useEffect,Component} from 'react';
-       
+import moment from 'moment';
 // import all the components we are going to use
 import {
   SafeAreaView,
@@ -123,7 +123,15 @@ const MenuItem = ({navigation}) =>
   }, []);
 
   
-  
+  const getMenuItemDetail = (rowMap, rowKey, data) => {
+    console.log('MenuItem Get Detail - Delete **-', data.item.id)
+    console.log('MenuItem Key', rowKey)    
+    navigation.navigate('AddMenuItemStack',{
+        screen: 'AddMenuItem', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
   const deleteItems = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
     closeItem(rowMap, rowKey);
@@ -182,7 +190,7 @@ const MenuItem = ({navigation}) =>
     console.log(rowMap, data);
     return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>navigation.navigate('AddUpdatePageStack',{Screen:'AddUpdatePage'})}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() => {getMenuItemDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
 
@@ -209,10 +217,19 @@ const MenuItem = ({navigation}) =>
 
   const ItemView = ({item}) => 
   {  
-    let title="",description=""; 
+    let itemName="",altName="",price="",priceType="",menuType="",category="",modifiers="",taxes="",description="",createdDate="",modifiedDate="",status=""; 
     try{   
-      title=item.title;
+      itemName=item.itemname;
+      altName=item.altername;
+      price=item.price;
+      priceType=item.pricetype;
+      menuType=item.menutype;
+      category=item.category;
+      modifiers=item.modifiers;
+      taxes=item.taxes;
       description=item.description;
+      createdDate=item.date_created;
+      modifiedDate=item.date_modified;
     } catch(e) { console.error(e); } 
   
     
@@ -221,8 +238,17 @@ const MenuItem = ({navigation}) =>
         <View>
           <Card style={{width: '95%', padding: 10, margin: 10, backgroundColor:'#F6FAFE'}}>
             <TouchableOpacity onPress={() => getItem(item)} >
-              <Text style={styles.itemStyle}>{"Menu Title "+title}</Text>  
-              <Text style={styles.itemStyle}>{"Menu Description "+description }</Text>            
+              <Text style={styles.itemStyle}>{"Menu Item Name: "+itemName}</Text>  
+              <Text style={styles.itemStyle}>{"Menu AlterName: "+altName }</Text> 
+              <Text style={styles.itemStyle}>{"Price: $"+price }</Text> 
+              <Text style={styles.itemStyle}>{"Price Type: "+priceType }</Text> 
+              <Text style={styles.itemStyle}>{"Menu Type: "+menuType }</Text> 
+              <Text style={styles.itemStyle}>{"Category: "+category }</Text> 
+              <Text style={styles.itemStyle}>{"Modifiers: "+modifiers }</Text> 
+              <Text style={styles.itemStyle}>{"Taxes: "+taxes+"%" }</Text> 
+              <Text style={styles.itemStyle}>{"Description: "+description }</Text> 
+              <Text style={styles.itemStyle}>{"Created Date: "+ moment(createdDate).format("MM-DD-YYYY hh:mma")}</Text> 
+              <Text style={styles.itemStyle}>{"Modified Date: "+ moment(modifiedDate).format("MM-DD-YYYY hh:mma")}</Text> 
             </TouchableOpacity>
           </Card>
         </View>
@@ -246,36 +272,19 @@ const MenuItem = ({navigation}) =>
   return (
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>
-          <TextInput
+        <TextInput
             style={styles.textInputStyle}
             onChangeText={(text) => searchFilterFunction(text)}
             value={search}
             underlineColorAndroid="transparent"
             placeholder="Search Here"
           />
-        <View>
-        <Modal animationType="slide"
-          transparent visible={isModalVisible}
-          presentationStyle="overFullScreen"
-          onDismiss={toggleModalVisibility}>
-          <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-              <TextInput placeholder="Item"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <TextInput placeholder="Price"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <Button title="Add" onPress={toggleModalVisibility} />
-            </View>
+        
+          <View  style={styles.headerView}>
+            <Text style={styles.txt}>
+                Menu Items
+            </Text>
           </View>
-        </Modal>
-        </View>
-          <Text style={styles.txt}>
-              Menu Items
-          </Text>
           <SwipeListView
             data={listData}
             keyExtractor={(item, index) => index.toString()}
@@ -286,11 +295,12 @@ const MenuItem = ({navigation}) =>
             previewRowKey={'0'}
             previewOpenValue={-40}
             previewOpenDelay={3000}
-            onRowDidOpen={onItemOpen}            
+            onRowDidOpen={onItemOpen}       
+            disableRightSwipe={true}      
           />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddMenuItemStack',{Screen:'AddMenuItem'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddMenuItemStack',{Screen:'AddMenuItem', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -309,12 +319,12 @@ const styles = StyleSheet.create({
     },
     textInputStyle: {
       height: 40,
-      borderWidth: 3,
+      borderWidth: 2,
       paddingLeft: 20,
       borderRadius:10,
       margin: 5,
-      borderColor: '#009688',
-      backgroundColor: 'yellow',
+      borderColor: '#5F6160',
+      backgroundColor: '#F6FAFE',
     },
     container2:{
         flex: 1,
@@ -323,16 +333,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     txt:{
-      paddingLeft:100,
+      //paddingLeft:100,
       fontSize:22,
-      fontWeight:'bold'
+      fontWeight:'bold',    
+    },
+    headerView:{    
+      alignItems: 'center',    
     },
     addButton:{
       position:'absolute',
       zIndex:11,
       right:20,
       bottom:50,
-      backgroundColor:'#307ecc',
+      backgroundColor:'#DB3133',
       width:80,
       height:80,
       borderRadius:50,
@@ -341,9 +354,10 @@ const styles = StyleSheet.create({
       elevation:8,
     },
     addButtonText:{
-    color:'#fff',
-    fontSize:24,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+     },
     modalContent: {
       backgroundColor: 'white',
       padding: 22,

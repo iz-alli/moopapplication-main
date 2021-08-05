@@ -3,7 +3,7 @@
 
 // import React in our code
 import React, {useState, useEffect,Component} from 'react';
-       
+import moment from 'moment';      
 // import all the components we are going to use
 import {
   SafeAreaView,
@@ -17,7 +17,7 @@ import {
   Alert,
   TouchableOpacity
 } from 'react-native';
-
+import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Card} from 'react-native-shadow-cards';
 
@@ -29,6 +29,7 @@ const Tablesscreen = ({navigation}) =>
 		setModalVisible(!isModalVisible);
     };
   const [count, setCount] = React.useState(0);
+  const [listData, setListData] = useState([]);
   const [search, setSearch] = useState('');
   const [filteredDataSource, setFilteredDataSource] = useState([]);
   const [masterDataSource, setMasterDataSource] = useState([]);
@@ -52,7 +53,7 @@ const Tablesscreen = ({navigation}) =>
             return responseJson.data;
           })
           .then( data  => {
-                setMasterDataSource(data);  
+                setListData(data);  
           })
           .catch((error) => {
             console.error(error);
@@ -65,6 +66,16 @@ const Tablesscreen = ({navigation}) =>
 
 
     
+  const closeItem = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+
+
+  const onItemOpen = rowKey => {
+    console.log('This row opened', rowKey);
+  };
 
   
   const ItemView = ({item}) => 
@@ -84,16 +95,20 @@ const Tablesscreen = ({navigation}) =>
 
     return (      
         <View>
-          <Card style={{width: '95%', padding: 10, margin: 10, backgroundColor:'#F6FAFE'}}>
-          <TouchableOpacity onPress={() => getItem(item)} >                        
-            <Text style={styles.itemStyle}>{"TableName : "+ tablename }</Text>
-            <Text style={styles.itemStyle}>{"Seats : "+ seats }</Text>
-            <Text style={styles.itemStyle}>{"User Id : "+ userid }</Text>
-            <Text style={styles.itemStyle}>{"Status : "+ status }</Text>   
-            <Text style={styles.itemStyle}>{"Is Available : "+ isavailable }</Text>   
-            <Text style={styles.itemStyle}>{"Seats Booked : "+ seatsbooked }</Text>   
-            <Text style={styles.itemStyle}>{"Booked Time : "+ bookedtime }</Text>   
-          </TouchableOpacity>
+          <Card style={{width: '95%', padding: 2, margin: 10, backgroundColor:'#F6FAFE'}}>
+            <TouchableOpacity onPress={() => getItem(item)} >                        
+              <Text style={styles.itemStyle}>{"TableName: "+ tablename }</Text>
+              <Text style={styles.itemStyle}>{"Seats: "+ seats }</Text>
+              <Text style={styles.itemStyle}>{"Table Manager: "+ userid }</Text>
+              {(
+                (status === "0") ? 
+                <Text style={styles.itemStyle}>{"Status: Available"}</Text>                 
+                :                 
+                <Text style={styles.itemStyle}>{"Status: Occupied"}</Text>              
+              )}                
+              <Text style={styles.itemStyle}>{"Seats Booked: "+ seatsbooked }</Text>   
+              <Text style={styles.itemStyle}>{"Booked Time: "+ moment(bookedtime).format("MM-DD-YYYY hh:mma") }</Text>   
+            </TouchableOpacity>
           </Card>
         </View>
     );
@@ -102,7 +117,7 @@ const Tablesscreen = ({navigation}) =>
   const ItemSeparatorView = () => 
   {
     return (
-      <View style={{height: 0,width: '100%',backgroundColor: '#C8C8C8'}}/> 
+      <View style={{height: 0, width: '100%', backgroundColor: '#C8C8C8'}}/> 
     );
   };
 
@@ -112,18 +127,121 @@ const Tablesscreen = ({navigation}) =>
   };
 
 
+  const deleteOrder = (data) => {      
+    console.log('Delete Order',data.item.id);
+    let dataToSend = {order_id: data.item.id};
+    let formBody = [];
+    for (let key in dataToSend) {
+      let encodedKey = encodeURIComponent(key);
+      let encodedValue = encodeURIComponent(dataToSend[key]);
+      formBody.push(encodedKey + '=' + encodedValue);
+    }
+    formBody = formBody.join('&');
+
+    fetch(`http://testweb.izaap.in/moop/api/index.php/service/tables/remove?X-API-KEY=MoopApp2021@!&table_id=${data.item.id}`, {
+      method: 'GET',
+      
+      headers: {
+        //Header Defination
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        
+        console.log(responseJson);        
+        if (responseJson.status === 'success') {         
+
+        } else {          
+          if(responseJson.message === 'No Tables Found!')
+          {
+            Alert.alert('Table Deleted Successfully')
+          }            
+        }
+      })
+      .catch((error) => {
+        //Hide Loader
+       // setLoading(false);
+        Alert.alert(error)
+        console.error(error);
+      });
+  };
+ 
+
+  const deleteItem = (rowMap, rowKey, data) => { 
+    console.log('RowKey delete item**-',data.item.id)
+    closeItem(rowMap, rowKey);
+    const newData = [...listData];    
+    const prevIndex = listData.findIndex(item => item.key === rowKey);
+    console.log(rowKey);
+    newData.splice(prevIndex, 1);
+    setListData(newData);    
+    deleteOrder(data);
+  };
+
+
+  const getTableDetail = (rowMap, rowKey, data) => {
+    console.log('Order Get Detail - Delete **-', data.item.id)
+    console.log('Order Key', rowKey)    
+    navigation.navigate('AddTableStack',{
+        screen: 'AddTable', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
+
+  const renderHiddenItem = (data, rowMap) => {
+    console.log("Data Item ID", data.item.id);
+    console.log("Row Map", rowMap);
+    console.log("Data", data);
+
+    return (
+    <View style={styles.rowBack}>
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() => {getTableDetail(rowMap, data.item.key, data)}}>      
+        <Text style={styles.btnText}>Update</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.actionButton, styles.deleteBtn]} onPress={() => {        
+        Alert.alert(
+          'Alert',
+          'Are you sure you want to delete ?',
+          [
+            {text:'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+            {text:'Yes', onPress: ()=> {
+              deleteItem(rowMap, data.item.key, data);
+            }}
+          ],
+          { cancelable: true }
+        );
+        }
+      }
+      >
+        <Text style={styles.btnText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+
   return (
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.container}>          
-          <FlatList
-            data={masterDataSource}
+        <SwipeListView
+            data={listData}
             keyExtractor={(item, index) => index.toString()}
-            ItemSeparatorComponent={ItemSeparatorView}
             renderItem={ItemView}
-          />
+            renderHiddenItem={renderHiddenItem}
+            leftOpenValue={200}
+            rightOpenValue={-150}
+            previewRowKey={'0'}
+            previewOpenValue={-40}
+            previewOpenDelay={3000}
+            onRowDidOpen={onItemOpen}   
+            disableRightSwipe={true}         
+      />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddTableStack',{Screen:'AddTable'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddTableStack',{Screen:'AddTable', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -164,7 +282,7 @@ const styles = StyleSheet.create({
       zIndex:11,
       right:20,
       bottom:50,
-      backgroundColor:'#307ecc',
+      backgroundColor:'#DB3133',
       width:80,
       height:80,
       borderRadius:50,
@@ -173,9 +291,10 @@ const styles = StyleSheet.create({
       elevation:8,
     },
     addButtonText:{
-    color:'#fff',
-    fontSize:24,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+     },
     modalContent: {
       backgroundColor: 'white',
       padding: 22,
@@ -192,6 +311,35 @@ const styles = StyleSheet.create({
       paddingRight:100,
       borderBottomWidth:2,
       borderBottomColor:'#bdb76b',    
+    },
+    rowBack: {
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingLeft: 5,
+    },
+    actionButton: {
+      alignItems: 'center',
+      bottom: 20,
+      justifyContent: 'center',
+      position: 'absolute',
+      top: 20,
+      right:60,
+      width: 75,
+    },
+    closeBtn: {
+      backgroundColor: 'blue',
+      //bottom: 40,
+      right: 80,
+      //width: 75,    
+      //top: 20,
+      // height: '100%'
+    },
+    deleteBtn: {
+      backgroundColor: 'red',
+      right: 10,
     },
 });
 

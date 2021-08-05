@@ -83,7 +83,7 @@ class ExpandableItemComponent extends React.Component {
                     this.props.item.subcategory.map((item, key) => (   
                       //console.log('test', key, item.val),                     
                       //Menu Pages to be added here
-                      item.val === 'Menu Type' ? 
+                      item.val === 'Menu Types' ? 
                     
                      <TouchableOpacity
                       key={key}
@@ -97,7 +97,7 @@ class ExpandableItemComponent extends React.Component {
 
                      :
 
-                     item.val === 'Menu Item' ? 
+                     item.val === 'Menu Items' ? 
 
                      <TouchableOpacity
                       key={key}
@@ -111,12 +111,26 @@ class ExpandableItemComponent extends React.Component {
                    
                    :
 
-                   item.val === 'Modifier' ? 
+                   item.val === 'Modifiers' ? 
 
                    <TouchableOpacity
                       key={key}
                       style={styles.content}
                       onPress={() => context.props.navObj.navigate('ModifierStack',{Screen:'Modifier'})}>
+                      <Text style={styles.text}>
+                         {item.val}
+                      </Text>
+                      <View style={styles.separator} />
+                    </TouchableOpacity>
+
+                    :
+
+                    item.val === 'ModifierGroups' ? 
+
+                   <TouchableOpacity
+                      key={key}
+                      style={styles.content}
+                      onPress={() => context.props.navObj.navigate('ModifierGroupStack',{Screen:'ModifierGroup'})}>
                       <Text style={styles.text}>
                          {item.val}
                       </Text>
@@ -383,7 +397,7 @@ class ExpandableItemComponent extends React.Component {
                 [
                   {text: 'Cancel', onPress: () => {return null}},
                   {text: 'Confirm', onPress: () => {
-                    AsyncStorage.clear();
+                    //AsyncStorage.clear();
                     context.props.navObj.replace('Auth');
                   }},
                 ],
@@ -456,9 +470,9 @@ export default class ExpandableViewSeparate extends React.Component {
       return (
         <View style={styles.container}>
 
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', width: '100%'}}>
               <TouchableOpacity onPress={() => test()}>
-                      <Image source={require('../Images/Log.png')} style={{width: 35, height: 35, marginLeft: 10}}/>
+                      <Image source={require('../Images/logo_icon_tagline_menu.png')} style={{top: -10, width: 70, height: 60, left: 10}}/>
               </TouchableOpacity>
               <Text style={styles.topHeading}>Moop Business</Text>  
         </View>
@@ -467,15 +481,19 @@ export default class ExpandableViewSeparate extends React.Component {
           <View style={styles.sideMenuContainer}>
           
           <ScrollView>
+
+          <TouchableOpacity onPress={() => this.props.navObj.navigate('ProfilePageStack',{Screen:'ProfilePage'})}>
             <View style={styles.profileHeader}>
-              <View style={styles.profileHeaderPicCircle}>
-                <Text style={{fontSize: 25, color: '#307ecc'}}>
-                  {'Moop React'.charAt(0)}
-                </Text>
-              </View>
               
-              <Text style={styles.profileHeaderText}>Moop User</Text>
+                  <View style={styles.profileHeaderPicCircle}>
+                    <Text style={{fontSize: 25, color: '#307ecc'}}>
+                      {'Moop React'.charAt(0)}
+                    </Text>
+                  </View>              
+                  <Text style={styles.profileHeaderText}>Moop User</Text>
+              
             </View>
+            </TouchableOpacity>
             <View style={styles.profileHeaderLine} />      
           
 
@@ -515,7 +533,7 @@ export default class ExpandableViewSeparate extends React.Component {
     {
       isExpanded: false,
       category_name: 'Menu',
-      subcategory: [{ id: 1, val: 'Menu Item' }, { id: 2, val: 'Menu Type' }, { id: 3, val: 'Modifier' }, { id: 4, val: 'Categories' }, { id: 5, val: 'Labels' }],
+      subcategory: [{ id: 1, val: 'Menu Items' }, { id: 2, val: 'Menu Types' }, { id: 3, val: 'Modifiers' }, { id: 4, val: 'ModifierGroups' }, { id: 5, val: 'Categories' }, { id: 6, val: 'Labels' }],
     },
     {
       isExpanded: false,
@@ -553,12 +571,15 @@ export default class ExpandableViewSeparate extends React.Component {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      paddingTop: 30,
+      paddingTop: 20,
       backgroundColor: '#F5FCFF',
     },
     topHeading: {
-      paddingLeft: 10,
+      paddingLeft: 15,
       fontSize: 20,
+      left: 10,
+      color: '#DB3133',
+      fontWeight: 'bold'
     },
     header: {
       backgroundColor: '#F5FCFF',
@@ -605,26 +626,28 @@ export default class ExpandableViewSeparate extends React.Component {
     profileHeader: {
       flexDirection: 'row',
       backgroundColor: '#DB3133',
-      padding: 10,
-      height:100,
+      padding: 5,
+      
+      height:80,
       textAlign: 'center',
     },
     profileHeaderPicCircle: {
-      width: 80,
-      height: 80,
-      borderRadius: 80 / 2,
+      width: 70,
+      height: 70,
+      borderRadius: 70 / 2,
       color: 'white',
       backgroundColor: '#ffffff',
       textAlign: 'center',
       justifyContent: 'center',
       alignItems: 'center',
-      
+      left: 5
     },
     profileHeaderText: {
       color: 'white',
       alignSelf: 'center',
       paddingHorizontal: 10,
       fontWeight: 'bold',
-      fontSize:20
+      fontSize:20,
+      left:5
     },
   });

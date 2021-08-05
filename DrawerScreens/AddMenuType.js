@@ -7,6 +7,12 @@ export default class AddMenuType extends Component{
  
   constructor(props){ 
     super(props); 
+
+    var titleInfo;
+    var descInfo;
+    var menuID;
+    var oper;
+  
     this.state={ 
       PickerValueHolder : '' 
     }
@@ -17,6 +23,43 @@ export default class AddMenuType extends Component{
       TextInputValue1: '',      
     }    
   }
+
+  componentWillMount(){
+    
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentWillMount") 
+      this.oper = this.props.route.params?.operation ?? 'add'
+      if(this.oper === "update")
+      {
+        console.log("update")
+        this.titleInfo = this.props.route.params?.data.item.title ?? 'defaultValue';
+        this.descInfo = this.props.route.params?.data.item.description ?? '0';
+        this.menuID = this.props.route.params?.data.item.id ?? '0';
+        this.setState({title: this.titleInfo}); 
+        this.setState({description: this.descInfo});        
+        this.setState({menuTypeId: this.menuID});
+        }
+        else
+        {
+          console.log("add")
+          this.setState({title: ''}); 
+          this.setState({description: ''});   
+          this.setState({menuTypeId: ''});         
+        }
+    });    
+  }
+
+
+  componentDidMount() {        
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentDidMount")   
+      console.log("data1", this.titleInfo)
+      console.log("data1", this.descInfo) 
+      console.log("data1", this.menuID)      
+    });
+    //this.fetchData();     
+  }
+
  
   GetSelectedPickerItem=()=>{ 
     Alert.alert(this.state.PickerValueHolder);
@@ -26,6 +69,7 @@ export default class AddMenuType extends Component{
     isVisible: true, //state of modal default false  
     title: '',
     description:'',
+    menuTypeId:'',
   }  
   buttonClickListener = () =>{
     const { TextInputValue }  = this.state;       
@@ -33,53 +77,110 @@ export default class AddMenuType extends Component{
 }
 
 addOrder =()=>{
-  console.log('AddMenuType'+ this.state.tableNo)
-  var dataToSend = {
-    user_id:251,
-    rest_id:3,
-    parent:0,
-    title:this.state.title,
-    description:this.state.description,
-    status:'0',
-    starttime:'10',
-    endtime:'11',
-    seats:'3', 
-  };
-  var formBody = [];
-  for (var key in dataToSend) {
-    var encodedKey = encodeURIComponent(key);
-    var encodedValue = encodeURIComponent(dataToSend[key]);
-    formBody.push(encodedKey + '=' + encodedValue);
-  }
-  formBody = formBody.join('&');
-
-  fetch('http://testweb.izaap.in/moop/api/index.php/service/menutypes/add?X-API-KEY=MoopApp2021@!', {
-    method: 'POST',
-    body: formBody,
-    headers: {
-      //Header Defination
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      //Hide Loader
-      //setLoading(false);
-      console.log(responseJson);
-      // If server response message same as Data Matched
-      if (responseJson.status == "success") {
-        Alert.alert('Menu Type has been Added successfully');
-        console.log('Menu Type has been Added successfully');
-        this.props.navigation.navigate('MenuTypeStack',{Screen:'MenuType'})
-      } else {
-        setErrortext('Error');
+  console.log("Operation", this.oper)
+  if(this.oper === "add")
+  {
+      console.log("Add Operation")
+      console.log('AddMenuType'+ this.state.title)
+      var dataToSend = {
+        user_id:251,
+        rest_id:3,
+        parent:0,
+        title:this.state.title,
+        description:this.state.description,
+        status:'0',
+        starttime:'10',
+        endtime:'11',
+        seats:'3', 
+      };
+      var formBody = [];
+      for (var key in dataToSend) {
+        var encodedKey = encodeURIComponent(key);
+        var encodedValue = encodeURIComponent(dataToSend[key]);
+        formBody.push(encodedKey + '=' + encodedValue);
       }
-    })
-    .catch((error) => {
-      //Hide Loader
-      //setLoading(false);
-      console.error(error);
-    });
+      formBody = formBody.join('&');
+
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/menutypes/add?X-API-KEY=MoopApp2021@!', {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          //Header Defination
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          //Hide Loader
+          //setLoading(false);
+          console.log(responseJson);
+          // If server response message same as Data Matched
+          if (responseJson.status == "success") {
+            Alert.alert('Menu Type has been Added successfully');
+            console.log('Menu Type has been Added successfully');
+            this.props.navigation.navigate('MenuTypeStack',{Screen:'MenuType'})
+          } else {
+            setErrortext('Error');
+          }
+        })
+        .catch((error) => {
+          //Hide Loader
+          //setLoading(false);
+          console.error(error);
+        });
+  }
+  else{
+    console.log("Update Operation")
+    console.log('AddMenuType'+ this.state.title)
+      var dataToSend = {
+        user_id:251,
+        rest_id:3,
+        parent:0,
+        title:this.state.title,
+        description:this.state.description,
+        status:'0',
+        starttime:'10',
+        endtime:'11',
+        seats:'3', 
+        menu_type_id: this.state.menuTypeId
+      };
+      var formBody = [];
+      for (var key in dataToSend) {
+        var encodedKey = encodeURIComponent(key);
+        var encodedValue = encodeURIComponent(dataToSend[key]);
+        formBody.push(encodedKey + '=' + encodedValue);
+      }
+      formBody = formBody.join('&');
+
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/menutypes/update?X-API-KEY=MoopApp2021@!', {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          //Header Defination
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          //Hide Loader
+          //setLoading(false);
+          console.log(responseJson);
+          // If server response message same as Data Matched
+          if (responseJson.status == "success") {
+            Alert.alert('Menu Type has been Updated successfully');
+            console.log('Menu Type has been Updated successfully');
+            this.props.navigation.navigate('MenuTypeStack',{Screen:'MenuType'})
+          } else {
+            setErrortext('Error');
+          }
+        })
+        .catch((error) => {
+          //Hide Loader
+          //setLoading(false);
+          console.error(error);
+        });
+      }
+  
 }
 
  render() {

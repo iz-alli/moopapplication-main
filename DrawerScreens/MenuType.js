@@ -126,8 +126,8 @@ const MenuType = ({navigation}) =>
         <View>
           <Card style={{width: '95%', padding: 10, margin: 10, backgroundColor:'#F6FAFE'}}>
             <TouchableOpacity onPress={() => getItem(item)} >
-              <Text style={styles.itemStyle}>{"Menu Title "+title}</Text>  
-              <Text style={styles.itemStyle}>{"Menu Description "+description }</Text>              
+              <Text style={styles.itemStyle}>{"Menu Title:"+ title}</Text>  
+              <Text style={styles.itemStyle}>{"Menu Description:"+ description }</Text>              
             </TouchableOpacity>
           </Card>
         </View>
@@ -147,6 +147,16 @@ const MenuType = ({navigation}) =>
     Alert.alert('Id : ' + item.id + '\n'+'Title : ' + item.title);
   };
 
+
+  const getMenuTypeDetail = (rowMap, rowKey, data) => {
+    console.log('Order Get Detail - Delete **-', data.item.id)
+    console.log('Order Key', rowKey)
+    
+    navigation.navigate('AddMenuTypeStack',{
+        screen: 'AddMenuType', 
+        params: {data: data, operation: 'update'},
+    });
+  }
 
   const deleteItems = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
@@ -206,7 +216,7 @@ const MenuType = ({navigation}) =>
     console.log(rowMap, data);
     return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>navigation.navigate('AddUpdatePageStack',{Screen:'AddUpdatePage'})}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>{getMenuTypeDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
 
@@ -242,51 +252,33 @@ const MenuType = ({navigation}) =>
             underlineColorAndroid="transparent"
             placeholder="Search Here"
           />
-        <View>
-        <Modal animationType="slide"
-          transparent visible={isModalVisible}
-          presentationStyle="overFullScreen"
-          onDismiss={toggleModalVisibility}>
-          <View style={styles.viewWrapper}>
-            <View style={styles.modalView}>
-              <TextInput placeholder="Item"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <TextInput placeholder="Price"
-                  value={inputValue} style={styles.textInput}
-                  onChangeText={(value) => setInputValue(value)} />
-
-              <Button title="Add" onPress={toggleModalVisibility} />
-            </View>
+          <View  style={styles.headerView}>
+            <Text style={styles.txt}>
+                Menu Types
+            </Text>
           </View>
-        </Modal>
-        </View>
-          <Text style={styles.txt}>
-              Menu Types
-          </Text>
-          
 
           <SwipeListView
             data={listData}
             keyExtractor={(item, index) => index.toString()}
             renderItem={ItemView}
-            renderHiddenItem={renderHiddenItem}
-            leftOpenValue={75}
+            renderHiddenItem={renderHiddenItem}            
             rightOpenValue={-150}
             previewRowKey={'0'}
             previewOpenValue={-40}
             previewOpenDelay={3000}
-            onRowDidOpen={onItemOpen}            
+            onRowDidOpen={onItemOpen}  
+            disableRightSwipe={true}           
           />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddMenuTypeStack',{Screen:'AddMenuType'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddMenuTypeStack',{Screen:'AddMenuType', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
 
 
 
@@ -314,16 +306,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     txt:{
-      paddingLeft:100,
+      //paddingLeft:100,
       fontSize:22,
-      fontWeight:'bold'
+      fontWeight:'bold',    
+    },
+    headerView:{    
+      alignItems: 'center',    
     },
     addButton:{
       position:'absolute',
       zIndex:11,
       right:20,
       bottom:50,
-      backgroundColor:'#307ecc',
+      backgroundColor:'#DB3133',
       width:80,
       height:80,
       borderRadius:50,
@@ -332,9 +327,10 @@ const styles = StyleSheet.create({
       elevation:8,
     },
     addButtonText:{
-    color:'#fff',
-    fontSize:24,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+     },
     modalContent: {
       backgroundColor: 'white',
       padding: 22,

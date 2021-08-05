@@ -3,12 +3,40 @@ import React, { Component } from 'react';
 import { StyleSheet, Alert, View, Button, Picker,Text,TextInput,TouchableOpacity,Modal} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
  
+
 export default class AddUpdatePage extends Component{
  
+  static navigationOptions = ({ navigation }) => {
+    navigation.route.navigationOptions ={
+      title: 'Add/Update', //Set Header Title
+      
+    }
+  
+  };
+  
   constructor(props){ 
     super(props); 
+    var data1;
+
+    var orderId;
+    var tableId;
+    var specialInstruction;
+    var comments;
+    var oper;
+
+    //const { navigation } = this.props;  
+    this.state = {
+      data:''
+    }
+    this.state = {user_id: ''}
+    this.state = {order_id: ''}
+    this.state = {table_id: ''}
+    this.state = {special_instruction: ''}
+    this.state = {comments_txt: ''}
+    this.state = {operation: ''}
+
     this.state={ 
-      PickerValueHolder : '' 
+      PickerValueHolder : ''
     }
     this.state = {
       TextInputValue: ''
@@ -17,6 +45,82 @@ export default class AddUpdatePage extends Component{
       TextInputValue1: '',      
     }    
   }
+
+  componentWillMount(){
+    
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentWillMount") 
+      this.oper = this.props.route.params?.operation ?? 'add'
+      if(this.oper === "update")
+      {
+        console.log("update")
+        this.data1 = this.props.route.params?.data.item.id ?? 'defaultValue';
+        this.orderId = this.props.route.params?.data.item.id ?? '0';
+        this.tableId = this.props.route.params?.data.item.tableid ?? 'Enter Table No';
+        this.specialInstruction = this.props.route.params?.data.item.special_instruction ?? 'Special Instruction';
+        this.comments = this.props.route.params?.data.item.comments;
+
+        this.setState({data: this.data1}); 
+        this.setState({order_id: this.orderId});
+        this.setState({table_id: this.tableId});
+        this.setState({special_instruction: this.specialInstruction});
+        this.setState({comments_txt: this.comments});
+        }
+        else{
+          console.log("add")
+          this.setState({data: ''}); 
+          this.setState({order_id: ''});
+          this.setState({table_id: ''});
+          this.setState({special_instruction: ''});
+          this.setState({comments_txt: ''});
+        }
+    });    
+  }
+
+  componentDidMount() {        
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentDidMount")   
+      console.log("data1", this.data1)
+      console.log("data1", this.orderId)
+      console.log("data1", this.tableId)
+      console.log("data1", this.specialInstruction)
+      console.log("data1", this.comments)
+    });
+    //this.fetchData();     
+  }
+
+
+  fetchData = async () => {
+    console.log("Fetch Data -", this.state.order_id)     
+    fetch(`http://testweb.izaap.in/moop/api/index.php/service/orders/view?X-API-KEY=MoopApp2021@!&order_id=${this.state.order_id}`,{
+        method: 'GET'
+        //Request Type 
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          //console.log(responseJson);
+          return responseJson.data;
+        })
+        .then( data  => {
+              //setListData(data);    
+              console.log('OrderDetails',data);
+              if(data != undefined){ 
+                     // data.map((item, index)=>{                          
+                      //const obj = JSON.parse(item.menujson);      
+                  //     obj.map((objitem, index)=>{       
+                  // })       
+                 // })
+              }
+              else
+              {
+                console.log('No Data Found');
+                Alert.alert('No Data Found');
+              } 
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+  }
  
   GetSelectedPickerItem=()=>{ 
     Alert.alert(this.state.PickerValueHolder);
@@ -24,8 +128,8 @@ export default class AddUpdatePage extends Component{
 
   state = {  
     isVisible: true, //state of modal default false  
-    specialIns: '',
-    tableNo:'',
+    // specialIns: '',
+    // tableNo:'',
   }  
   buttonClickListener = () =>{
     const { TextInputValue }  = this.state ;
@@ -34,61 +138,124 @@ export default class AddUpdatePage extends Component{
 }
 
 addOrder =()=>{
-  console.log('AddOrder'+ this.state.tableNo)
-  var dataToSend = {
-    user_id:'251',
-    rest_id:'3',
-    table_id:this.state.tableNo,
-    seats:'3',
-    menujson:[{}],
-    paymentjson:[{}],
-    amount:'500',
-    paymentmode:'Apple',
-    status:this.state.PickerValueHolder,
-    transactionid:'1',
-    transactiontag:'1',
-    comments:'2345',
-    orderjson:[{}],
-    orderfee :'100',
-    special_instruction:this.state.specialIns,
-    tip_amount:10,    
-  };
-  var formBody = [];
-  for (var key in dataToSend) {
-    var encodedKey = encodeURIComponent(key);
-    var encodedValue = encodeURIComponent(dataToSend[key]);
-    formBody.push(encodedKey + '=' + encodedValue);
-  }
-  formBody = formBody.join('&');
-
-  fetch('http://testweb.izaap.in/moop/api/index.php/service/orders/place?X-API-KEY=MoopApp2021@!', {
-    method: 'POST',
-    body: formBody,
-    headers: {
-      //Header Defination
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      //Hide Loader
-      //setLoading(false);
-      console.log(responseJson);
-      // If server response message same as Data Matched
-      if (responseJson.status == "success") {
-        Alert.alert('Order has been placed successfully');
-        console.log('Order has been placed successfully');
-        this.props.navigation.navigate('orderScreenStack',{Screen:'orderScreen'})
-
-      } else {
-        setErrortext('Error');
+  console.log("Operation", this.oper)
+  if(this.oper === "add")
+  {
+      console.log("Add Operation")
+      var dataToSend = {
+        user_id:'251',
+        rest_id:'3',
+        table_id:this.state.table_id,
+        seats:'3',
+        menujson:[{}],
+        paymentjson:[{}],
+        amount:'500',
+        paymentmode:'Apple',
+        status:this.state.PickerValueHolder,
+        transactionid:'1',
+        transactiontag:'1',
+        comments:this.state.comments_txt,
+        orderjson:[{}],
+        orderfee :'100',
+        special_instruction:this.state.special_instruction,
+        tip_amount:10,    
+      };
+      var formBody = [];
+      for (var key in dataToSend) {
+        var encodedKey = encodeURIComponent(key);
+        var encodedValue = encodeURIComponent(dataToSend[key]);
+        formBody.push(encodedKey + '=' + encodedValue);
       }
+      formBody = formBody.join('&');
+    
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/orders/place?X-API-KEY=MoopApp2021@!', {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          //Header Defination
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          //Hide Loader
+          //setLoading(false);
+          console.log(responseJson);
+          // If server response message same as Data Matched
+          if (responseJson.status == "success") {
+            Alert.alert('Order has been placed successfully');
+            console.log('Order has been placed successfully');
+            this.props.navigation.navigate('orderScreenStack',{Screen:'orderScreen'})
+          } else {
+            setErrortext('Error');
+          }
+        })
+        .catch((error) => {
+          //Hide Loader
+          //setLoading(false);
+          console.error(error);
+        });
+  }
+  else{
+    console.log("Update Operation")
+
+    console.log("OrderId -", this.state.order_id)
+    var dataToSend = {
+      user_id:'251',
+      rest_id:'3',
+      table_id:this.state.table_id,
+      seats:'3',
+      menujson:[{}],
+      paymentjson:[{}],
+      amount:'500',
+      paymentmode:'Apple',
+      status:this.state.PickerValueHolder,
+      transactionid:'1',
+      transactiontag:'1',
+      comments:this.state.comments_txt,
+      orderjson:[{}],
+      orderfee :'100',
+      special_instruction:this.state.special_instruction,
+      tip_amount:10,  
+      order_id:this.state.order_id  
+    };
+    var formBody = [];
+    for (var key in dataToSend) {
+      var encodedKey = encodeURIComponent(key);
+      var encodedValue = encodeURIComponent(dataToSend[key]);
+      formBody.push(encodedKey + '=' + encodedValue);
+    }
+    formBody = formBody.join('&');
+  
+    fetch('http://testweb.izaap.in/moop/api/index.php/service/orders/place?X-API-KEY=MoopApp2021@!', {
+      method: 'POST',
+      body: formBody,
+      headers: {
+        //Header Defination
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
     })
-    .catch((error) => {
-      //Hide Loader
-      //setLoading(false);
-      console.error(error);
-    });
+      .then((response) => response.json())
+      .then((responseJson) => {
+        //Hide Loader
+        //setLoading(false);
+        console.log(responseJson);
+        // If server response message same as Data Matched
+        if (responseJson.status == "success") {
+          Alert.alert('Order has been Updated successfully');
+          console.log('Order has been Updated successfully');
+          this.props.navigation.navigate('orderScreenStack',{Screen:'orderScreen'})
+        } else {
+          setErrortext('Error');
+        }
+      })
+      .catch((error) => {
+        //Hide Loader
+        //setLoading(false);
+        console.error(error);
+      });
+  }
+  
 }
 
  render() {
@@ -102,9 +269,10 @@ addOrder =()=>{
              </Text>   
              <TextInput
                 placeholder='Enter Table No'
+                keyboardType="numeric"
                 placeholderTextColor='#303030'
-                onChangeText={(tableNo) => this.setState({ tableNo })}
-                value={this.state.tableNo}
+                onChangeText={(table_id) => this.setState({ table_id })}
+                value={this.state.table_id}
                 style={{
                  borderWidth: 3,
                  borderRadius:10,
@@ -116,27 +284,8 @@ addOrder =()=>{
                  height:50   
                 }}/>
           </View>
-
-              <View style={{flexirection:'row',
-              top:35}}>
-              <Text style={{padding: 10,fontSize:18,fontWeight:'bold',right:40,left:20}}>
-                {'Status :'}
-              </Text>
-    
-            <View style={{width:186,height:50,bottom:50,borderWidth:3,borderRadius:10,left:100,}}>
-            <Picker 
-                
-            selectedValue={this.state.PickerValueHolder}
-    
-            onValueChange={(itemValue, itemIndex) => this.setState({PickerValueHolder: itemValue})} >
-    
-            <Picker.Item label="Active" value="Active" />        
-            <Picker.Item label="Completed" value="Completed" />
-            
-          </Picker>
-          </View>
       
-        </View>
+        <View style={{height: 30}}/>
 
         <View style={{flexDirection:'row',}}>
           <Text style={{fontSize:18,left:10,top:10,fontWeight:'bold'}}>
@@ -145,8 +294,8 @@ addOrder =()=>{
           <TextInput
               placeholder='Enter Instructions Here '
                 placeholderTextColor='#303030'                
-                onChangeText={(specialIns) => this.setState({ specialIns })}
-                value={this.state.specialIns}
+                onChangeText={(special_instruction) => this.setState({ special_instruction })}
+                value={this.state.special_instruction}
                 style={{
                   borderWidth: 2,
                   borderRadius:10,
@@ -161,7 +310,6 @@ addOrder =()=>{
                   fontSize:18,                  
                 }}
                 />
-      
         </View>
 
     <View>
