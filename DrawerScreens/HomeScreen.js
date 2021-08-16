@@ -1,8 +1,10 @@
 import React,{Component} from 'react';
 import { TouchableOpacity } from 'react-native';
 import{View,Image,ImageBackground,StyleSheet,Text}from 'react-native';
-import FTP from 'react-native-ftp';
- 
+//import FTP from 'react-native-ftp';
+
+
+
 
 export default class HomeScreen extends Component
 {          
@@ -14,6 +16,7 @@ export default class HomeScreen extends Component
     }
 
     componentDidMount(){
+      
       // TODO: What to do with the module?
       // FTP.setup("139.59.65.210",21) //Setup host
       // FTP.login("root","6cZxbds69^@Ky!*Y").then(
@@ -36,7 +39,7 @@ export default class HomeScreen extends Component
     {
         return(
             <View style={{ flex:1,justifyContent:'center',alignItems:'center'}}>
-                <Text>This is Home Screen</Text>                
+                <Text>This is Home Screen</Text>                  
             </View>
         );
     }

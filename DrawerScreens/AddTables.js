@@ -3,10 +3,14 @@ import React, { Component } from 'react';
 import { StyleSheet, Alert, View, Button, Picker,Text,TextInput,TouchableOpacity,Modal} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
  
-export default class AddTables extends Component{
- 
+export default class AddTables extends Component
+{
   constructor(props){ 
     super(props); 
+    var tableInfo;
+    var seatInfo;
+    var tableIdInfo;
+
     this.state={ 
       PickerValueHolder : '' 
     }
@@ -18,6 +22,42 @@ export default class AddTables extends Component{
     }    
   }
  
+  componentWillMount()
+  {
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentWillMount") 
+      this.oper = this.props.route.params?.operation ?? 'add'
+      if(this.oper === "update")
+      {
+        console.log("update")
+        
+        this.tableIdInfo = this.props.route.params?.data.item.id ?? '0';
+        this.tableInfo = this.props.route.params?.data.item.tablename ?? 'Table Name';
+        this.seatInfo = this.props.route.params?.data.item.seats ?? 'Seats';
+                
+        this.setState({table_id: this.tableIdInfo});        
+        this.setState({seats: this.seatInfo});
+        this.setState({name: this.tableInfo});
+        }
+        else{
+          console.log("add")
+          this.setState({table_id: ''}); 
+          this.setState({name: ''});
+          this.setState({seats: ''});
+        }
+    });    
+  }
+
+  componentDidMount() {        
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentDidMount")   
+      console.log("data1", this.tableInfo)
+      console.log("data1", this.seatInfo)
+      console.log("data1", this.tableIdInfo)      
+    });
+    //this.fetchData();     
+  }
+  
   GetSelectedPickerItem=()=>{ 
     Alert.alert(this.state.PickerValueHolder);
   }
@@ -26,6 +66,7 @@ export default class AddTables extends Component{
     isVisible: true, //state of modal default false  
     name: '',
     seats:'',
+    table_id:'',
   }  
   buttonClickListener = () =>{
     const { TextInputValue }  = this.state;       
@@ -33,51 +74,103 @@ export default class AddTables extends Component{
 }
 
 addOrder =()=>{
-  console.log('AddMenuType'+ this.state.tableNo)
-  var dataToSend = {
-    user_id:251,
-    rest_id:3,
-    seats:this.state.seats,
-    status:0,
-    isavailable:'yes',
-    seatsbooked:'0',
-    name:this.state.name,
-  };
-  var formBody = [];
-  for (var key in dataToSend) {
-    var encodedKey = encodeURIComponent(key);
-    var encodedValue = encodeURIComponent(dataToSend[key]);
-    formBody.push(encodedKey + '=' + encodedValue);
+  console.log("Add Operation", this.oper)
+  if(this.oper === "add")
+  {
+    console.log('AddMenuType'+ this.state.tableNo)
+    var dataToSend = {
+      user_id:251,
+      rest_id:3,
+      seats:this.state.seats,
+      status:0,
+      isavailable:'yes',
+      seatsbooked:'0',
+      name:this.state.name,
+    };
+    var formBody = [];
+    for (var key in dataToSend) {
+      var encodedKey = encodeURIComponent(key);
+      var encodedValue = encodeURIComponent(dataToSend[key]);
+      formBody.push(encodedKey + '=' + encodedValue);
+    }
+    formBody = formBody.join('&');
+    console.log(formBody)
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/tables/add?X-API-KEY=MoopApp2021@!', {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          //Header Defination
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        //Hide Loader
+        //setLoading(false);
+        console.log(responseJson);
+        // If server response message same as Data Matched
+        if (responseJson.status == "success") {
+          Alert.alert('Table has been Added successfully');
+          console.log('Table has been Added successfully');
+          this.props.navigation.navigate('tablesStack',{Screen:'Tables'})
+        } else {
+          setErrortext('Error');
+        }
+      })
+      .catch((error) => {
+        //Hide Loader
+        //setLoading(false);
+        console.error(error);
+      });
   }
-  formBody = formBody.join('&');
-console.log(formBody)
-  fetch('http://testweb.izaap.in/moop/api/index.php/service/tables/add?X-API-KEY=MoopApp2021@!', {
-    method: 'POST',
-    body: formBody,
-    headers: {
-      //Header Defination
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      //Hide Loader
-      //setLoading(false);
-      console.log(responseJson);
-      // If server response message same as Data Matched
-      if (responseJson.status == "success") {
-        Alert.alert('Table has been Added successfully');
-        console.log('Table has been Added successfully');
-        this.props.navigation.navigate('tablesStack',{Screen:'Tables'})
-      } else {
-        setErrortext('Error');
-      }
-    })
-    .catch((error) => {
-      //Hide Loader
-      //setLoading(false);
-      console.error(error);
-    });
+  else{
+    console.log('Update Operation')
+    var dataToSend = {
+      user_id:251,
+      rest_id:3,
+      seats:this.state.seats,
+      status:0,
+      isavailable:'yes',
+      seatsbooked:'0',
+      name:this.state.name,
+      table_id:this.state.table_id
+    };
+    var formBody = [];
+    for (var key in dataToSend) {
+      var encodedKey = encodeURIComponent(key);
+      var encodedValue = encodeURIComponent(dataToSend[key]);
+      formBody.push(encodedKey + '=' + encodedValue);
+    }
+    formBody = formBody.join('&');
+    console.log(formBody)
+      fetch('http://testweb.izaap.in/moop/api/index.php/service/tables/update?X-API-KEY=MoopApp2021@!', {
+        method: 'POST',
+        body: formBody,
+        headers: {
+          //Header Defination
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        },
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        //Hide Loader
+        //setLoading(false);
+        console.log(responseJson);
+        // If server response message same as Data Matched
+        if (responseJson.status == "success") {
+          Alert.alert('Table has been Updated successfully');
+          console.log('Table has been Updated successfully');
+          this.props.navigation.navigate('tablesStack',{Screen:'Tables'})
+        } else {
+          setErrortext('Error');
+        }
+      })
+      .catch((error) => {
+        //Hide Loader
+        //setLoading(false);
+        console.error(error);
+      });
+  }
 }
 
  render() {
@@ -115,6 +208,7 @@ console.log(formBody)
                     </Text>   
                     <TextInput
                         placeholder='Seats'
+                        keyboardType='numeric'
                         placeholderTextColor='#303030'
                         onChangeText={(seats) => this.setState({ seats })}
                         value={this.state.seats}

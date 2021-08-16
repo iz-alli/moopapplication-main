@@ -4,6 +4,7 @@
 // import React in our code
 import React, {useState, useEffect,Component} from 'react';
        
+
 // import all the components we are going to use
 import {
   SafeAreaView,
@@ -89,6 +90,15 @@ const Employee = ({navigation}) =>
     console.log('This row opened', rowKey);
   };
 
+  const getEmployeeDetail = (rowMap, rowKey, data) => {
+    console.log('Employee Get Detail - Delete **-', data.item.id)
+    console.log('employee Key', rowKey)    
+    navigation.navigate('AddEmployeeStack',{
+        screen: 'AddEmployee', 
+        params: {data: data, operation: 'update'},
+    });
+  }
+
   const deleteItems = (rowMap, rowKey, data) => { 
     console.log('RowKey delete item**-',data.item.id)
     closeItem(rowMap, rowKey);
@@ -97,12 +107,12 @@ const Employee = ({navigation}) =>
     console.log(rowKey);
     newData.splice(prevIndex, 1);
     setListData(newData);    
-    deleteModifier(data);
+    deleteEmployee(data);
   };
 
 
-  const deleteModifier = (data) => {      
-    console.log('Delete Order',data.item.id);
+  const deleteEmployee = (data) => {      
+    console.log('Delete Employee',data.item.id);
     let dataToSend = {id: data.item.id};
     let formBody = [];
     for (let key in dataToSend) {
@@ -146,7 +156,7 @@ const Employee = ({navigation}) =>
     console.log(rowMap, data);
     return(
     <View style={styles.rowBack}>
-      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() =>navigation.navigate('AddEmployeeStack',{Screen:'AddEmployee'})}>      
+      <TouchableOpacity style={[styles.actionButton, styles.closeBtn]} onPress={() => {getEmployeeDetail(rowMap, data.item.key, data)}}>      
         <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
 
@@ -248,13 +258,12 @@ const Employee = ({navigation}) =>
           />
         </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddEmployeeStack',{Screen:'AddEmployee'})}>
+      <TouchableOpacity style={styles.addButton} onPress={() =>navigation.navigate('AddEmployeeStack',{Screen:'AddEmployee', params: {operation:'add'}})}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
-
 
 
 const styles = StyleSheet.create({

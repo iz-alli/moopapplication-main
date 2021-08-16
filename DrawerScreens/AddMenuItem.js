@@ -199,7 +199,7 @@ addOrder =()=>{
       description:this.state.description,
       status:'1',
       seats:'3',  
-      modifier_id:this.state.modifier_id, 
+      menu_item_id:this.state.menu_item_id, 
     };
     var formBody = [];
     for (var key in dataToSend) {
@@ -209,7 +209,7 @@ addOrder =()=>{
     }
     formBody = formBody.join('&');
   
-    fetch('http://testweb.izaap.in/moop/api/index.php/service/menuitems/add?X-API-KEY=MoopApp2021@!', {
+    fetch('http://testweb.izaap.in/moop/api/index.php/service/menuitems/update?X-API-KEY=MoopApp2021@!', {
       method: 'POST',
       body: formBody,
       headers: {
@@ -224,8 +224,8 @@ addOrder =()=>{
         console.log(responseJson);
         // If server response message same as Data Matched
         if (responseJson.status == "success") {
-          Alert.alert('Menu Item has been Added successfully');
-          console.log('Menu Item has been Added successfully');
+          Alert.alert('Menu Item has been Updated successfully');
+          console.log('Menu Item has been Updated successfully');
           this.props.navigation.navigate('MenuItemStack',{Screen:'MenuItem'})
         } else {
           setErrortext('Error');

@@ -9,6 +9,22 @@ export default class AddEmployee extends Component{
  
   constructor(props){ 
     
+    var emailInfo;
+    var passwordInfo;
+    var first_nameInfo;
+    var last_nameInfo;
+    var bioInfo;
+    var genderInfo;
+    var addressInfo;
+    var countryInfo;
+    var titleInfo;
+    var stateInfo;
+    var cityInfo;
+    var zipInfo;
+    var phoneInfo;
+    var roleInfo;
+    var employeeIdInfo
+
     super(props); 
     this.state={ 
       PickerValueHolder : '' 
@@ -22,6 +38,76 @@ export default class AddEmployee extends Component{
   }
 
   
+  componentWillMount(){
+    
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentWillMount") 
+      this.oper = this.props.route.params?.operation ?? 'add'
+      if(this.oper === "update")
+      {
+        console.log("update")        
+        this.employeeIdInfo = this.props.route.params?.data.item.id ?? '0';
+        this.emailInfo = this.props.route.params?.data.item.email ?? 'Email';
+        this.passwordInfo = this.props.route.params?.data.item.password ?? 'Password';
+        this.first_nameInfo = this.props.route.params?.data.item.first_name ?? 'First Name';
+        this.last_nameInfo = this.props.route.params?.data.item.last_name ?? 'Last Name';
+        this.bioInfo = this.props.route.params?.data.item.bio ?? 'Bio';
+        this.genderInfo = this.props.route.params?.data.item.gender ?? 'Gender';
+        this.addressInfo = this.props.route.params?.data.item.address ?? 'Address';
+        this.countryInfo = this.props.route.params?.data.item.country ?? 'Country';
+        this.titleInfo = this.props.route.params?.data.item.title ?? 'Title';
+        this.stateInfo = this.props.route.params?.data.item.state ?? 'State';
+        this.cityInfo = this.props.route.params?.data.item.city ?? 'City';
+        this.zipInfo = this.props.route.params?.data.item.zip ?? 'Zip';
+        this.phoneInfo = this.props.route.params?.data.item.role ?? 'Phone';
+        this.roleInfo = this.props.route.params?.data.item.phone ?? 'Role';
+
+
+        this.setState({employee_id: this.employeeIdInfo}); 
+        this.setState({email: this.emailInfo});
+        this.setState({password: this.passwordInfo});
+        this.setState({first_name: this.first_nameInfo});
+        this.setState({last_name: this.last_nameInfo});
+        this.setState({bio: this.bioInfo});
+        this.setState({gender: this.genderInfo});
+        this.setState({address: this.addressInfo});
+        this.setState({country: this.countryInfo});
+        this.setState({title: this.titleInfo});
+        this.setState({state: this.stateInfo});
+        this.setState({city: this.cityInfo});
+        this.setState({zip: this.zipInfo});
+        this.setState({phone: this.phoneInfo});
+        this.setState({role: this.roleInfo});
+        }
+        else{
+          console.log("add")
+          this.setState({employee_id: ''}); 
+          this.setState({email: ''});
+          this.setState({password: ''});
+          this.setState({first_name: ''});
+          this.setState({last_name: ''});
+          this.setState({bio: ''});
+          this.setState({gender: ''});
+          this.setState({address: ''});
+          this.setState({country: ''});
+          this.setState({title: ''});
+          this.setState({state: ''});
+          this.setState({city: ''});
+          this.setState({zip: ''});
+          this.setState({phone: ''});
+          this.setState({role: ''});
+        }
+    });    
+  }
+
+  componentDidMount() {        
+    this.props.navigation.addListener('focus', () => {
+      console.log("componentDidMount")   
+      
+    });
+    //this.fetchData();     
+  }
+
  
   GetSelectedPickerItem=()=>{ 
     Alert.alert(this.state.PickerValueHolder);
@@ -44,6 +130,7 @@ export default class AddEmployee extends Component{
     zip:'',
     phone:'',
     role:'',
+    employee_id:'',
   }  
   buttonClickListener = () =>{
     const { TextInputValue }  = this.state;       
@@ -52,72 +139,147 @@ export default class AddEmployee extends Component{
 
 addOrder =()=>{
   
-    if(typeof this.state.email === 'undefined' || typeof this.state.password === 'undefined' || typeof this.state.first_name === 'undefined' || typeof this.state.last_name === 'undefined' || typeof this.state.bio === 'undefined' || typeof this.state.gender === 'undefined' || typeof this.state.address === 'undefined' || typeof this.state.country === 'undefined' || typeof this.state.title === 'undefined' || typeof this.state.states === 'undefined' || typeof this.state.city === 'undefined' || typeof this.state.zip === 'undefined' || typeof this.state.phone === 'undefined' || typeof this.state.role === 'undefined')
+  if(this.oper === "add")
   {
-      Alert.alert('Please Input Required Fields')
-  }
-  else{
-    if(this.state.password === this.state.confirm_password){
-
-  console.log('AddEmployee'+ this.state.email + "\n" + this.state.password + "\n" + this.state.first_name + "\n" + this.state.last_name + "\n" + this.state.bio + "\n" + this.state.gender + "\n" + this.state.address + "\n" + this.state.country + "\n" + this.state.title + "\n" + this.state.states + "\n" + this.state.city + "\n" + this.state.zip + "\n" + this.state.phone + "\n" + this.state.role)
-  var dataToSend = {    
-    email:this.state.email,
-    password:this.state.password,
-    first_name:this.state.first_name,
-    last_name:this.state.last_name,
-    bio:this.state.bio,
-    gender:this.state.gender,
-    address:this.state.address,
-    country:this.state.country,
-    title:this.state.title,
-    state:this.state.states,
-    city:this.state.city,
-    zip:this.state.zip,
-    phone:this.state.phone,
-    role:this.state.role,
-  };
-  var formBody = [];
-  for (var key in dataToSend) {
-    var encodedKey = encodeURIComponent(key);
-    var encodedValue = encodeURIComponent(dataToSend[key]);
-    formBody.push(encodedKey + '=' + encodedValue);
-  }
-  formBody = formBody.join('&');
-
-  fetch('http://139.59.65.210/moop/api/index.php/service/user/register', {
-    method: 'POST',
-    body: formBody,
-    headers: {
-      //Header Defination
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      //Hide Loader
-      //setLoading(false);
-      console.log(responseJson);
-      // If server response message same as Data Matched
-      if (responseJson.status == "success") {
-        Alert.alert('Employee has been Added successfully');
-        console.log('Employee has been Added successfully');
-        this.props.navigation.navigate('employeeStack',{Screen:'Employee'})
-      } else {
-        //setErrortext('Error');
-        Alert.alert(responseJson.message)
+      console.log("Add Operation")
+      if(typeof this.state.email === 'undefined' || typeof this.state.password === 'undefined' || typeof this.state.first_name === 'undefined' || typeof this.state.last_name === 'undefined' || typeof this.state.bio === 'undefined' || typeof this.state.gender === 'undefined' || typeof this.state.address === 'undefined' || typeof this.state.country === 'undefined' || typeof this.state.title === 'undefined' || typeof this.state.states === 'undefined' || typeof this.state.city === 'undefined' || typeof this.state.zip === 'undefined' || typeof this.state.phone === 'undefined' || typeof this.state.role === 'undefined')
+      {
+          Alert.alert('Please Input Required Fields')
       }
-    })
-    .catch((error) => {
-      //Hide Loader
-      //setLoading(false);
-      console.error(error);
-      Alert.alert(responseJson.message)
-    });  
-}
-else{
-    Alert.alert("Password Mismatch")
-}
+      else
+      {
+        if(this.state.password === this.state.confirm_password){
+    
+            console.log('AddEmployee'+ this.state.email + "\n" + this.state.password + "\n" + this.state.first_name + "\n" + this.state.last_name + "\n" + this.state.bio + "\n" + this.state.gender + "\n" + this.state.address + "\n" + this.state.country + "\n" + this.state.title + "\n" + this.state.states + "\n" + this.state.city + "\n" + this.state.zip + "\n" + this.state.phone + "\n" + this.state.role)
+            var dataToSend = {    
+              email:this.state.email,
+              password:this.state.password,
+              first_name:this.state.first_name,
+              last_name:this.state.last_name,
+              bio:this.state.bio,
+              gender:this.state.gender,
+              address:this.state.address,
+              country:this.state.country,
+              title:this.state.title,
+              state:this.state.states,
+              city:this.state.city,
+              zip:this.state.zip,
+              phone:this.state.phone,
+              role:this.state.role,
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+              var encodedKey = encodeURIComponent(key);
+              var encodedValue = encodeURIComponent(dataToSend[key]);
+              formBody.push(encodedKey + '=' + encodedValue);
+            }
+            formBody = formBody.join('&');
+          
+            fetch('http://139.59.65.210/moop/api/index.php/service/user/register', {
+              method: 'POST',
+              body: formBody,
+              headers: {
+                //Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+              },
+            })
+              .then((response) => response.json())
+              .then((responseJson) => {
+                //Hide Loader
+                //setLoading(false);
+                console.log(responseJson);
+                // If server response message same as Data Matched
+                if (responseJson.status == "success") {
+                  Alert.alert('Employee has been Added successfully');
+                  console.log('Employee has been Added successfully');
+                  this.props.navigation.navigate('employeeStack',{Screen:'Employee'})
+                } else {
+                  //setErrortext('Error');
+                  Alert.alert(responseJson.message)
+                }
+              })
+              .catch((error) => {
+                //Hide Loader
+                //setLoading(false);
+                console.error(error);
+                Alert.alert(responseJson.message)
+              });  
+          }
+          else{
+              Alert.alert("Password Mismatch")
+          }
+      }
   }
+  else
+  {
+    console.log("Update Operation")
+    if(typeof this.state.email === 'undefined' || typeof this.state.password === 'undefined' || typeof this.state.first_name === 'undefined' || typeof this.state.last_name === 'undefined' || typeof this.state.bio === 'undefined' || typeof this.state.gender === 'undefined' || typeof this.state.address === 'undefined' || typeof this.state.country === 'undefined' || typeof this.state.title === 'undefined' || typeof this.state.states === 'undefined' || typeof this.state.city === 'undefined' || typeof this.state.zip === 'undefined' || typeof this.state.phone === 'undefined' || typeof this.state.role === 'undefined')
+    {
+        Alert.alert('Please Input Required Fields')
+    }
+    else{
+      if(this.state.password === this.state.confirm_password){
+  
+          console.log('AddEmployee'+ this.state.email + "\n" + this.state.password + "\n" + this.state.first_name + "\n" + this.state.last_name + "\n" + this.state.bio + "\n" + this.state.gender + "\n" + this.state.address + "\n" + this.state.country + "\n" + this.state.title + "\n" + this.state.states + "\n" + this.state.city + "\n" + this.state.zip + "\n" + this.state.phone + "\n" + this.state.role)
+          var dataToSend = {    
+            email:this.state.email,
+            password:this.state.password,
+            first_name:this.state.first_name,
+            last_name:this.state.last_name,
+            bio:this.state.bio,
+            gender:this.state.gender,
+            address:this.state.address,
+            country:this.state.country,
+            title:this.state.title,
+            state:this.state.states,
+            city:this.state.city,
+            zip:this.state.zip,
+            phone:this.state.phone,
+            role:this.state.role,
+          };
+          var formBody = [];
+          for (var key in dataToSend) {
+            var encodedKey = encodeURIComponent(key);
+            var encodedValue = encodeURIComponent(dataToSend[key]);
+            formBody.push(encodedKey + '=' + encodedValue);
+          }
+          formBody = formBody.join('&');
+        
+          fetch('http://139.59.65.210/moop/api/index.php/service/user/register', {
+            method: 'POST',
+            body: formBody,
+            headers: {
+              //Header Defination
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+          })
+            .then((response) => response.json())
+            .then((responseJson) => {
+              //Hide Loader
+              //setLoading(false);
+              console.log(responseJson);
+              // If server response message same as Data Matched
+              if (responseJson.status == "success") {
+                Alert.alert('Employee has been Added successfully');
+                console.log('Employee has been Added successfully');
+                this.props.navigation.navigate('employeeStack',{Screen:'Employee'})
+              } else {
+                //setErrortext('Error');
+                Alert.alert(responseJson.message)
+              }
+            })
+            .catch((error) => {
+              //Hide Loader
+              //setLoading(false);
+              console.error(error);
+              Alert.alert(responseJson.message)
+            });  
+        }
+        else{
+            Alert.alert("Password Mismatch")
+        }
+    }
+  }   
 }
 
  render() {

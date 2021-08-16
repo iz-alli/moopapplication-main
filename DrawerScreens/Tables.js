@@ -95,21 +95,31 @@ const Tablesscreen = ({navigation}) =>
 
     return (      
         <View>
-          <Card style={{width: '95%', padding: 2, margin: 10, backgroundColor:'#F6FAFE'}}>
-            <TouchableOpacity onPress={() => getItem(item)} >                        
-              <Text style={styles.itemStyle}>{"TableName: "+ tablename }</Text>
-              <Text style={styles.itemStyle}>{"Seats: "+ seats }</Text>
-              <Text style={styles.itemStyle}>{"Table Manager: "+ userid }</Text>
-              {(
+          {(
                 (status === "0") ? 
-                <Text style={styles.itemStyle}>{"Status: Available"}</Text>                 
-                :                 
-                <Text style={styles.itemStyle}>{"Status: Occupied"}</Text>              
-              )}                
-              <Text style={styles.itemStyle}>{"Seats Booked: "+ seatsbooked }</Text>   
-              <Text style={styles.itemStyle}>{"Booked Time: "+ moment(bookedtime).format("MM-DD-YYYY hh:mma") }</Text>   
-            </TouchableOpacity>
-          </Card>
+                <Card style={{width: '95%', padding: 2, margin: 10, backgroundColor:'white'}}>
+                  <TouchableOpacity onPress={() => getItem(item)}>                        
+                  <Text style={styles.itemStyle}>{"TableName: "+ tablename }</Text>
+                  <Text style={styles.itemStyle}>{"Seats: "+ seats }</Text>
+                  <Text style={styles.itemStyle}>{"Table Manager: "+ userid }</Text>
+                    <Text style={styles.itemStyle}>{"Status: Available"}</Text> 
+                    <Text style={styles.itemStyle}>{"Seats Booked: "+ seatsbooked }</Text>   
+                  <Text style={styles.itemStyle}>{"Booked Time: "+ moment(bookedtime).format("MM-DD-YYYY hh:mma") }</Text>   
+                </TouchableOpacity>  
+                </Card>
+                :
+                <Card style={{width: '95%', padding: 2, margin: 10, backgroundColor:'#DB3133'}}>
+                  <TouchableOpacity onPress={() => getItem(item)}>                        
+                    <Text style={styles.itemStyleWhite}>{"TableName: "+ tablename }</Text>
+                    <Text style={styles.itemStyleWhite}>{"Seats: "+ seats }</Text>
+                    <Text style={styles.itemStyleWhite}>{"Table Manager: "+ userid }</Text> 
+                      <Text style={styles.itemStyleWhite}>{"Status: Occupied"}</Text>         
+                      <Text style={styles.itemStyleWhite}>{"Seats Booked: "+ seatsbooked }</Text>   
+                    <Text style={styles.itemStyleWhite}>{"Booked Time: "+ moment(bookedtime).format("MM-DD-YYYY hh:mma") }</Text>   
+                </TouchableOpacity> 
+                </Card>
+          )}
+          
         </View>
     );
   };
@@ -257,6 +267,10 @@ const styles = StyleSheet.create({
     itemStyle: {
       padding: 10,
     },
+    itemStyleWhite: {
+      padding: 10,
+      color: 'white'
+    },
     textInputStyle: {
       height: 40,
       borderWidth: 3,
@@ -311,6 +325,9 @@ const styles = StyleSheet.create({
       paddingRight:100,
       borderBottomWidth:2,
       borderBottomColor:'#bdb76b',    
+    },
+    btnText:{
+      color: 'white'
     },
     rowBack: {
       alignItems: 'center',

@@ -28,8 +28,8 @@ export default class AddMenuType extends Component{
   }
   
  
-  componentWillMount(){
-    
+  componentWillMount()
+  {    
     this.props.navigation.addListener('focus', () => {
       console.log("componentWillMount") 
       this.oper = this.props.route.params?.operation ?? 'add'
@@ -51,10 +51,9 @@ export default class AddMenuType extends Component{
         this.setState({modifierName: this.modifierNameInfo});
         this.setState({modifierPrice: this.modifierPriceInfo});
         this.setState({modifierAltName: this.modifierAltNameInfo});
-
-       
-        }
-        else{
+      }
+      else
+      {
           console.log("add")
           this.setState({modifierId: ''}); 
           this.setState({modifierGroupName: ''});
@@ -62,9 +61,8 @@ export default class AddMenuType extends Component{
           this.setState({maxAllowed: ''});
           this.setState({modifierName: ''});
           this.setState({modifierPrice: ''});
-          this.setState({modifierAltName: ''});
-  
-        }
+          this.setState({modifierAltName: ''});  
+      }
     });    
   }
 
@@ -212,12 +210,12 @@ addOrder =()=>{
     }  
 }
 
- render() {
+ render() 
+ {
    return (
         <View style={styles.container}>
         <View>
         <ScrollView>
-
               <View style={{flexDirection: 'row',top:20}}>
                     <Text style={{  flex: 1, padding: 3, fontSize:18, fontWeight:'bold'}}>
                     {'Modifier Group Name'}
